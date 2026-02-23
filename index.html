@@ -524,6 +524,7 @@ nav {
   border-radius: 20px; overflow: hidden;
   box-shadow: var(--shadow); transition: all 0.4s;
   cursor: pointer;
+  position: relative;
 }
 
 .blog-card:hover {
@@ -862,7 +863,7 @@ textarea.form-control { resize: vertical; min-height: 130px; }
 .admin-login {
   display: none; position: fixed; inset: 0; z-index: 4000;
   background: rgba(0,0,0,0.9);
-  display: none; align-items: center; justify-content: center;
+  align-items: center; justify-content: center;
 }
 
 .admin-login.open { display: flex; }
@@ -983,9 +984,248 @@ footer {
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
   padding: 4px 12px; border-radius: 20px; margin-right: 6px;
 }
+
+/* ===== INLINE EDITING STYLES ===== */
+body.edit-mode [data-editable] {
+  position: relative;
+  transition: outline 0.2s, background 0.2s;
+}
+
+body.edit-mode [data-editable]:hover {
+  outline: 2px dashed var(--terracotta);
+  outline-offset: 3px;
+  background: rgba(192,83,58,0.04);
+  border-radius: 4px;
+  cursor: text;
+}
+
+body.edit-mode [data-editable]:focus {
+  outline: 2px solid var(--terracotta) !important;
+  outline-offset: 3px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 4px;
+}
+
+body.edit-mode [data-editable]::after {
+  content: '✏️';
+  position: absolute;
+  top: -10px; right: -10px;
+  font-size: 0.75rem;
+  background: var(--terracotta);
+  color: white;
+  border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+body.edit-mode [data-editable]:hover::after {
+  opacity: 1;
+}
+
+/* Edit mode banner */
+.edit-mode-banner {
+  display: none;
+  position: fixed; top: 72px; left: 0; right: 0;
+  background: var(--olive);
+  color: white;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  z-index: 998;
+  text-transform: uppercase;
+}
+
+body.edit-mode .edit-mode-banner { display: block; }
+body.edit-mode .page { padding-top: 72px; }
+
+/* Blog card edit overlay */
+body.edit-mode .blog-card {
+  position: relative;
+}
+body.edit-mode .blog-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border: 2px dashed transparent;
+  border-radius: 20px;
+  pointer-events: none;
+  transition: border-color 0.2s;
+  z-index: 2;
+}
+body.edit-mode .blog-card:hover::before {
+  border-color: rgba(192,83,58,0.3);
+}
+
+/* Edit controls toolbar for blog cards */
+.blog-edit-toolbar {
+  display: none;
+  position: absolute;
+  top: 8px; left: 8px;
+  z-index: 10;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+body.edit-mode .blog-card:hover .blog-edit-toolbar {
+  display: flex;
+}
+
+.blog-edit-toolbar button {
+  background: var(--terracotta);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.2s;
+}
+
+.blog-edit-toolbar button:hover { background: var(--terracotta-dark); }
+.blog-edit-toolbar button.delete-btn { background: #e53e3e; }
+.blog-edit-toolbar button.delete-btn:hover { background: #c53030; }
+
+/* Full blog post edit button */
+.edit-full-post-btn {
+  display: none;
+  background: var(--olive);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+body.edit-mode .edit-full-post-btn { display: inline-block; }
+
+/* Recipe card edit toolbar */
+body.edit-mode .recipe-card {
+  position: relative;
+}
+
+.recipe-edit-toolbar {
+  display: none;
+  position: absolute;
+  top: 8px; right: 8px;
+  z-index: 10;
+  gap: 4px;
+}
+
+body.edit-mode .recipe-card:hover .recipe-edit-toolbar {
+  display: flex;
+}
+
+.recipe-edit-toolbar button {
+  background: var(--olive);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.recipe-edit-toolbar button:hover { background: var(--olive-light); }
+
+/* Team card edit toolbar */
+body.edit-mode .team-card {
+  position: relative;
+}
+
+.team-edit-toolbar {
+  display: none;
+  position: absolute;
+  top: 8px; right: 8px;
+  z-index: 10;
+}
+
+body.edit-mode .team-card:hover .team-edit-toolbar { display: flex; }
+
+/* Edit modal */
+.edit-modal-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 5000;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+  overflow-y: auto;
+  padding: 40px 20px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.edit-modal-overlay.open { display: flex; }
+
+.edit-modal-box {
+  background: var(--white);
+  border-radius: 24px;
+  max-width: 800px; width: 100%;
+  padding: 40px;
+  animation: modalIn 0.3s ease;
+}
+
+.edit-modal-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem; margin-bottom: 24px;
+}
+
+.edit-field-group { margin-bottom: 18px; }
+.edit-field-group label {
+  display: block;
+  font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: #555; margin-bottom: 6px;
+}
+
+.edit-field-group input,
+.edit-field-group textarea,
+.edit-field-group select {
+  width: 100%; padding: 12px 16px;
+  border: 2px solid var(--warm);
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.92rem;
+  background: var(--cream);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.edit-field-group input:focus,
+.edit-field-group textarea:focus { border-color: var(--terracotta); background: var(--white); }
+
+.edit-field-group textarea { resize: vertical; min-height: 100px; }
+.edit-field-group textarea.large { min-height: 200px; }
+.edit-field-group textarea.xlarge { min-height: 300px; }
+
+.edit-modal-actions {
+  display: flex; gap: 12px; margin-top: 24px;
+}
+
+/* Hover hint for edit mode */
+body.edit-mode .recipe-card:hover,
+body.edit-mode .blog-card:hover,
+body.edit-mode .team-card:hover {
+  cursor: default;
+}
 </style>
 </head>
 <body>
+
+<!-- EDIT MODE BANNER -->
+<div class="edit-mode-banner">✏️ Edit Mode Active — Click on any text to edit it directly. Hover over cards to see edit options.</div>
 
 <!-- NAVIGATION -->
 <nav>
@@ -1010,9 +1250,9 @@ footer {
     <div class="hero-bg" id="heroBg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <div class="hero-tagline">Authentic Flavors, Timeless Recipes</div>
-      <h1 class="hero-title">Cook with<br><em>Passion</em></h1>
-      <p class="hero-sub">Discover thousands of handcrafted recipes from the world's finest kitchens. Simple ingredients, extraordinary results.</p>
+      <div class="hero-tagline" data-editable data-field="hero-tagline">Authentic Flavors, Timeless Recipes</div>
+      <h1 class="hero-title" data-editable data-field="hero-title">Cook with<br><em>Passion</em></h1>
+      <p class="hero-sub" data-editable data-field="hero-sub">Discover thousands of handcrafted recipes from the world's finest kitchens. Simple ingredients, extraordinary results.</p>
       <a href="#" class="btn-primary" onclick="showPage('recipes')">Explore Recipes</a>
       &nbsp;&nbsp;
       <a href="#" class="btn-secondary" style="color:var(--white);border-color:var(--white)" onclick="showPage('blog')">Read Blog</a>
@@ -1022,17 +1262,17 @@ footer {
 
   <!-- Stats -->
   <div class="stats-strip">
-    <div class="stat"><span class="stat-number">2,400+</span><span class="stat-label">Recipes</span></div>
-    <div class="stat"><span class="stat-number">180+</span><span class="stat-label">Cuisines</span></div>
-    <div class="stat"><span class="stat-number">48K</span><span class="stat-label">Happy Cooks</span></div>
-    <div class="stat"><span class="stat-number">20</span><span class="stat-label">Expert Chefs</span></div>
+    <div class="stat"><span class="stat-number" data-editable data-field="stat1-num">2,400+</span><span class="stat-label" data-editable data-field="stat1-label">Recipes</span></div>
+    <div class="stat"><span class="stat-number" data-editable data-field="stat2-num">180+</span><span class="stat-label" data-editable data-field="stat2-label">Cuisines</span></div>
+    <div class="stat"><span class="stat-number" data-editable data-field="stat3-num">48K</span><span class="stat-label" data-editable data-field="stat3-label">Happy Cooks</span></div>
+    <div class="stat"><span class="stat-number" data-editable data-field="stat4-num">20</span><span class="stat-label" data-editable data-field="stat4-label">Expert Chefs</span></div>
   </div>
 
   <!-- Featured Recipes -->
   <section class="section featured-section">
     <div style="max-width:1200px;margin:0 auto">
-      <p class="section-sub">This Week's Picks</p>
-      <h2 class="section-title">Featured Recipes</h2>
+      <p class="section-sub" data-editable data-field="featured-sub">This Week's Picks</p>
+      <h2 class="section-title" data-editable data-field="featured-title">Featured Recipes</h2>
       <div class="divider"></div>
       <div class="recipes-grid" id="featuredRecipes"></div>
     </div>
@@ -1041,8 +1281,8 @@ footer {
   <!-- Categories -->
   <section class="section" style="background:var(--cream)">
     <div style="max-width:1100px;margin:0 auto">
-      <p class="section-sub">Browse by Type</p>
-      <h2 class="section-title">Recipe Categories</h2>
+      <p class="section-sub" data-editable data-field="cats-sub">Browse by Type</p>
+      <h2 class="section-title" data-editable data-field="cats-title">Recipe Categories</h2>
       <div class="divider"></div>
       <div class="cats-grid" id="catsGrid"></div>
     </div>
@@ -1055,8 +1295,8 @@ footer {
     <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1547592180-85f173990554?w=1400&auto=format&fit=crop&q=80')"></div>
     <div class="hero-overlay"></div>
     <div class="page-hero-content">
-      <h1>Our Recipes</h1>
-      <p>From quick weeknight dinners to weekend feasts</p>
+      <h1 data-editable data-field="recipes-hero-title">Our Recipes</h1>
+      <p data-editable data-field="recipes-hero-sub">From quick weeknight dinners to weekend feasts</p>
     </div>
   </div>
   <div class="search-bar-wrap">
@@ -1079,8 +1319,8 @@ footer {
 <!-- ===== BLOG PAGE ===== -->
 <div id="page-blog" class="page">
   <div class="blog-header">
-    <h1>Food Stories & Guides</h1>
-    <p>Culinary wisdom, tips, and tales from our kitchen</p>
+    <h1 data-editable data-field="blog-header-title">Food Stories & Guides</h1>
+    <p data-editable data-field="blog-header-sub">Culinary wisdom, tips, and tales from our kitchen</p>
   </div>
   <div class="blog-controls">
     <div>
@@ -1097,49 +1337,49 @@ footer {
 <!-- ===== ABOUT PAGE ===== -->
 <div id="page-about" class="page">
   <div class="about-hero">
-    <h1>Our Story</h1>
-    <p>La Cucina was born from a simple love of food — real, honest, delicious food that brings people together around the table.</p>
+    <h1 data-editable data-field="about-hero-title">Our Story</h1>
+    <p data-editable data-field="about-hero-sub">La Cucina was born from a simple love of food — real, honest, delicious food that brings people together around the table.</p>
   </div>
   <div class="about-grid">
     <img src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?w=800&auto=format&fit=crop&q=80" alt="Our kitchen" class="about-img">
     <div class="about-text">
-      <h2>Cooking is Our Language</h2>
-      <p>Founded in 2018, La Cucina started as a small food blog written by chef Maria Rossi in her Bologna apartment. What began as a personal journal of cherished family recipes grew into one of the most beloved cooking destinations on the internet.</p>
-      <p>We believe that great cooking isn't about fancy equipment or exotic ingredients — it's about understanding flavor, respecting tradition, and cooking with heart. Every recipe on our platform has been tested, tasted, and perfected by our team of passionate chefs.</p>
-      <p>Today, La Cucina is home to over 2,400 recipes spanning 180 world cuisines, loved by home cooks in 60+ countries. We are dedicated to keeping the art of cooking alive, joyful, and accessible to everyone.</p>
+      <h2 data-editable data-field="about-text-title">Cooking is Our Language</h2>
+      <p data-editable data-field="about-p1">Founded in 2018, La Cucina started as a small food blog written by chef Maria Rossi in her Bologna apartment. What began as a personal journal of cherished family recipes grew into one of the most beloved cooking destinations on the internet.</p>
+      <p data-editable data-field="about-p2">We believe that great cooking isn't about fancy equipment or exotic ingredients — it's about understanding flavor, respecting tradition, and cooking with heart. Every recipe on our platform has been tested, tasted, and perfected by our team of passionate chefs.</p>
+      <p data-editable data-field="about-p3">Today, La Cucina is home to over 2,400 recipes spanning 180 world cuisines, loved by home cooks in 60+ countries. We are dedicated to keeping the art of cooking alive, joyful, and accessible to everyone.</p>
       <a href="#" class="btn-primary" onclick="showPage('recipes')">Explore Our Recipes</a>
     </div>
   </div>
   <div class="team-section">
-    <h2 style="text-align:center">Meet Our Chefs</h2>
-    <p class="section-sub" style="text-align:center">The passionate people behind every recipe</p>
+    <h2 style="text-align:center" data-editable data-field="team-title">Meet Our Chefs</h2>
+    <p class="section-sub" style="text-align:center" data-editable data-field="team-sub">The passionate people behind every recipe</p>
     <div class="team-grid" id="teamGrid"></div>
   </div>
   <section class="section" style="background:var(--cream)">
     <div style="max-width:700px;margin:0 auto;text-align:center">
-      <p class="section-sub">Our Values</p>
-      <h2 class="section-title">What We Believe In</h2>
+      <p class="section-sub" data-editable data-field="values-sub">Our Values</p>
+      <h2 class="section-title" data-editable data-field="values-title">What We Believe In</h2>
       <div class="divider" style="margin:16px auto 48px"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;text-align:left">
         <div style="background:var(--white);padding:28px;border-radius:16px">
           <div style="font-size:1.5rem;margin-bottom:12px">🌿</div>
-          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem">Fresh Ingredients</strong>
-          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6">We champion seasonal, local produce and advocate for conscious sourcing.</p>
+          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem" data-editable data-field="val1-title">Fresh Ingredients</strong>
+          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6" data-editable data-field="val1-text">We champion seasonal, local produce and advocate for conscious sourcing.</p>
         </div>
         <div style="background:var(--white);padding:28px;border-radius:16px">
           <div style="font-size:1.5rem;margin-bottom:12px">❤️</div>
-          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem">Made with Love</strong>
-          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6">Every recipe is thoroughly tested and refined with genuine care and passion.</p>
+          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem" data-editable data-field="val2-title">Made with Love</strong>
+          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6" data-editable data-field="val2-text">Every recipe is thoroughly tested and refined with genuine care and passion.</p>
         </div>
         <div style="background:var(--white);padding:28px;border-radius:16px">
           <div style="font-size:1.5rem;margin-bottom:12px">🌍</div>
-          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem">Global Flavors</strong>
-          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6">We celebrate culinary traditions from every corner of the world.</p>
+          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem" data-editable data-field="val3-title">Global Flavors</strong>
+          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6" data-editable data-field="val3-text">We celebrate culinary traditions from every corner of the world.</p>
         </div>
         <div style="background:var(--white);padding:28px;border-radius:16px">
           <div style="font-size:1.5rem;margin-bottom:12px">📖</div>
-          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem">Always Learning</strong>
-          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6">Cooking is a lifelong journey and we're always growing, experimenting, and improving.</p>
+          <strong style="font-family:'Playfair Display',serif;font-size:1.1rem" data-editable data-field="val4-title">Always Learning</strong>
+          <p style="font-size:0.88rem;color:#666;margin-top:8px;line-height:1.6" data-editable data-field="val4-text">Cooking is a lifelong journey and we're always growing, experimenting, and improving.</p>
         </div>
       </div>
     </div>
@@ -1152,40 +1392,40 @@ footer {
     <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&auto=format&fit=crop&q=80')"></div>
     <div class="hero-overlay"></div>
     <div class="page-hero-content">
-      <h1>Get in Touch</h1>
-      <p>We'd love to hear from you — recipe ideas, collaborations, or just a hello!</p>
+      <h1 data-editable data-field="contact-hero-title">Get in Touch</h1>
+      <p data-editable data-field="contact-hero-sub">We'd love to hear from you — recipe ideas, collaborations, or just a hello!</p>
     </div>
   </div>
   <div class="contact-wrap">
     <div class="contact-info">
-      <h2>Let's Start a Conversation</h2>
-      <p>Whether you have a question about a recipe, want to collaborate on a project, or simply want to share your cooking story — we're here and happy to connect.</p>
+      <h2 data-editable data-field="contact-heading">Let's Start a Conversation</h2>
+      <p data-editable data-field="contact-intro">Whether you have a question about a recipe, want to collaborate on a project, or simply want to share your cooking story — we're here and happy to connect.</p>
       <div class="contact-detail">
         <div class="contact-detail-icon">📍</div>
         <div class="contact-detail-text">
           <strong>Address</strong>
-          <span>Via della Cucina 12, Bologna, Italy 40121</span>
+          <span data-editable data-field="contact-address">Via della Cucina 12, Bologna, Italy 40121</span>
         </div>
       </div>
       <div class="contact-detail">
         <div class="contact-detail-icon">📧</div>
         <div class="contact-detail-text">
           <strong>Email</strong>
-          <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="650d0009090a2509040610060c0b044b060a08">[email&#160;protected]</a></span>
+          <span data-editable data-field="contact-email">hello@lacucina.com</span>
         </div>
       </div>
       <div class="contact-detail">
         <div class="contact-detail-icon">📱</div>
         <div class="contact-detail-text">
           <strong>Phone</strong>
-          <span>+39 051 123 4567</span>
+          <span data-editable data-field="contact-phone">+39 051 123 4567</span>
         </div>
       </div>
       <div class="contact-detail">
         <div class="contact-detail-icon">🕐</div>
         <div class="contact-detail-text">
           <strong>Hours</strong>
-          <span>Monday – Friday, 9am – 6pm CET</span>
+          <span data-editable data-field="contact-hours">Monday – Friday, 9am – 6pm CET</span>
         </div>
       </div>
       <div style="margin-top:32px">
@@ -1193,7 +1433,7 @@ footer {
       </div>
     </div>
     <div class="contact-form">
-      <h3>Send us a Message</h3>
+      <h3 data-editable data-field="contact-form-title">Send us a Message</h3>
       <div class="form-group">
         <label>Your Name</label>
         <input type="text" class="form-control" placeholder="Maria Rossi">
@@ -1220,7 +1460,7 @@ footer {
   <div class="footer-grid">
     <div>
       <span class="footer-logo">La Cucina</span>
-      <p class="footer-desc">Your home for authentic, soul-warming recipes from around the world. We believe cooking is love made visible.</p>
+      <p class="footer-desc" data-editable data-field="footer-desc">Your home for authentic, soul-warming recipes from around the world. We believe cooking is love made visible.</p>
     </div>
     <div class="footer-col">
       <h4>Explore</h4>
@@ -1245,7 +1485,7 @@ footer {
       <a href="#">Newsletter</a>
     </div>
   </div>
-  <div class="footer-bottom">© 2026 La Cucina. All rights reserved. Made with ❤️ and a lot of olive oil.</div>
+  <div class="footer-bottom" data-editable data-field="footer-bottom">© 2026 La Cucina. All rights reserved. Made with ❤️ and a lot of olive oil.</div>
 </footer>
 
 <!-- RECIPE DETAIL MODAL -->
@@ -1300,8 +1540,8 @@ footer {
     </div>
     <p>Add a new blog post using the editor below.</p>
     <div class="admin-tabs">
-      <button class="admin-tab active" onclick="switchAdminTab('text')">📝 Text Editor</button>
-      <button class="admin-tab" onclick="switchAdminTab('code')">💻 Code (JSON)</button>
+      <button class="admin-tab active" onclick="switchAdminTab('text',event)">📝 Text Editor</button>
+      <button class="admin-tab" onclick="switchAdminTab('code',event)">💻 Code (JSON)</button>
     </div>
 
     <!-- Text Editor Panel -->
@@ -1361,16 +1601,35 @@ footer {
   </div>
 </div>
 
+<!-- EDIT CONTENT MODAL (for blog/recipe full editing) -->
+<div class="edit-modal-overlay" id="editContentModal" onclick="closeEditModal(event)">
+  <div class="edit-modal-box" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h3 id="editModalTitle">Edit Content</h3>
+      <button onclick="closeEditModalBtn()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:#aaa">✕</button>
+    </div>
+    <div id="editModalFields"></div>
+    <div class="edit-modal-actions">
+      <button class="btn-primary" onclick="saveEditModal()">💾 Save Changes</button>
+      <button class="btn-secondary" onclick="closeEditModalBtn()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ========================
 // STATE
 // ========================
 let isAdmin = false;
+let editModeActive = false;
 let currentPage = 'home';
 const ADMIN_PASS = 'admin123';
+let editModalCallback = null;
+let currentEditBlogIndex = -1;
+let currentEditRecipeIndex = -1;
 
 // ========================
 // DATA: RECIPES
@@ -1449,23 +1708,7 @@ const blogs = [
     readTime: 9,
     image: "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?w=900&auto=format&fit=crop&q=80",
     excerpt: "Master the ancient craft of handmade pasta with this comprehensive guide to flour types, egg ratios, and shaping techniques that have been passed down through generations.",
-    content: `
-      <p>There is something deeply meditative about making pasta by hand. The rhythmic motion of kneading dough, the transformation of simple flour and eggs into smooth, golden silk — it is one of those rare kitchen rituals that connects you to centuries of culinary tradition. Handmade pasta is not merely food; it is an act of love.</p>
-      <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&auto=format&fit=crop&q=80" alt="Pasta making">
-      <h2>Choosing the Right Flour</h2>
-      <p>The foundation of any great pasta is flour. In Italy, <em>00 flour</em> (doppio zero) is the gold standard for fresh pasta. Milled to a fine, silky powder, it creates an exceptionally smooth and elastic dough. However, semolina flour — coarser and golden — is preferred for extruded shapes like penne or rigatoni, lending them that characteristic rough texture that grips sauce beautifully.</p>
-      <p>For most home cooks, a blend of 70% 00 flour and 30% semolina strikes the perfect balance: smooth enough to roll thin, yet sturdy enough to hold shapes. Avoid all-purpose flour if you can — its protein content is not quite right, resulting in pasta that is either too tough or too fragile.</p>
-      <h2>The Egg Equation</h2>
-      <p>Eggs are the soul of fresh pasta. Traditional Emilian pasta uses only egg yolks — the richer the eggs, the deeper the gold of your dough. A classic ratio is 100g of flour to 1 whole egg. For extra richness, replace some whole eggs with additional yolks.</p>
-      <p>The freshness of your eggs matters immensely. Pasture-raised eggs with vivid orange yolks will produce a pasta of extraordinary color and flavor. If possible, source your eggs from a local farm. The difference is visible and unmistakable.</p>
-      <img src="https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=80" alt="Fresh pasta">
-      <h2>The Kneading Ritual</h2>
-      <p>Kneading develops gluten — the network of proteins that gives pasta its structure and elasticity. You will know your dough is ready when it transforms from a shaggy mess into a smooth, supple ball that springs back gently when pressed. This typically takes 8–10 minutes of vigorous hand-kneading.</p>
-      <p>Once kneaded, the dough must rest. Wrap it tightly in plastic and leave it at room temperature for at least 30 minutes. This resting period is not optional — it allows the gluten to relax, making rolling infinitely easier. Skipping this step will leave you wrestling with dough that keeps springing back.</p>
-      <h2>Rolling and Shaping</h2>
-      <p>Rolling pasta thin is an art. Whether you use a rolling pin or a pasta machine, the goal is consistent thickness — around 1–2mm for most shapes. Work in small portions, keeping unused dough covered. The pasta should be almost translucent when held to the light for delicate shapes like tagliolini.</p>
-      <p>For fettuccine and tagliatelle, dust the sheet generously with semolina, roll it loosely, and cut into ribbons. For pappardelle, cut wider. For ravioli, stamp out circles or rectangles, fill, and seal tightly, pressing out any air pockets which can cause bursting during cooking.</p>
-    `,
+    content: `<p>There is something deeply meditative about making pasta by hand. The rhythmic motion of kneading dough, the transformation of simple flour and eggs into smooth, golden silk — it is one of those rare kitchen rituals that connects you to centuries of culinary tradition. Handmade pasta is not merely food; it is an act of love.</p><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&auto=format&fit=crop&q=80" alt="Pasta making"><h2>Choosing the Right Flour</h2><p>The foundation of any great pasta is flour. In Italy, <em>00 flour</em> (doppio zero) is the gold standard for fresh pasta. Milled to a fine, silky powder, it creates an exceptionally smooth and elastic dough. However, semolina flour — coarser and golden — is preferred for extruded shapes like penne or rigatoni, lending them that characteristic rough texture that grips sauce beautifully.</p><p>For most home cooks, a blend of 70% 00 flour and 30% semolina strikes the perfect balance: smooth enough to roll thin, yet sturdy enough to hold shapes. Avoid all-purpose flour if you can — its protein content is not quite right, resulting in pasta that is either too tough or too fragile.</p><h2>The Egg Equation</h2><p>Eggs are the soul of fresh pasta. Traditional Emilian pasta uses only egg yolks — the richer the eggs, the deeper the gold of your dough. A classic ratio is 100g of flour to 1 whole egg. For extra richness, replace some whole eggs with additional yolks.</p><img src="https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=80" alt="Fresh pasta"><h2>The Kneading Ritual</h2><p>Kneading develops gluten — the network of proteins that gives pasta its structure and elasticity. You will know your dough is ready when it transforms from a shaggy mess into a smooth, supple ball that springs back gently when pressed. This typically takes 8–10 minutes of vigorous hand-kneading.</p>`,
     faqs: [
       {q: "Can I make pasta without a pasta machine?", a: "Absolutely. A sturdy rolling pin and patience are all you need. Roll on a large, lightly floured surface, working from the center outward."},
       {q: "How long can fresh pasta be stored?", a: "Fresh pasta can be refrigerated for up to 2 days or frozen for up to 1 month. Dust well with semolina to prevent sticking."},
@@ -1474,7 +1717,7 @@ const blogs = [
       {q: "Can I use gluten-free flour for pasta?", a: "Yes, but results vary. A blend of rice flour and tapioca works best. The dough will be less elastic, so handle it gently."}
     ],
     keyTakeaways: ["Use 00 flour for smooth pasta; semolina for extruded shapes", "The classic ratio is 100g flour to 1 egg", "Kneading 8–10 minutes develops proper gluten structure", "Always rest dough for at least 30 minutes", "Roll pasta to near-transparency for delicate shapes"],
-    conclusion: "Making pasta by hand is one of the most rewarding skills a home cook can develop. Yes, it takes practice — your first batch may be imperfect, and that's perfectly fine. With each attempt, you'll feel more connected to the dough, more confident in your hands, and more appreciative of the simple alchemy that transforms flour and eggs into something extraordinary. Start this weekend, and you'll wonder how you ever served dried pasta before."
+    conclusion: "Making pasta by hand is one of the most rewarding skills a home cook can develop. Yes, it takes practice — your first batch may be imperfect, and that's perfectly fine. With each attempt, you'll feel more connected to the dough, more confident in your hands, and more appreciative of the simple alchemy that transforms flour and eggs into something extraordinary."
   },
   {
     title: "Understanding the Science of Bread Baking",
@@ -1483,29 +1726,14 @@ const blogs = [
     readTime: 11,
     image: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=900&auto=format&fit=crop&q=80",
     excerpt: "Unlock the chemistry behind perfect bread — from gluten networks and fermentation to steam baking and the Maillard reaction that creates that golden crust.",
-    content: `
-      <p>Bread is perhaps humanity's oldest prepared food, yet even experienced bakers sometimes struggle to understand why a loaf succeeds or fails. The good news is that bread baking is not magic — it's science, and once you understand the underlying chemistry, you'll be able to troubleshoot problems, improvise confidently, and bake consistently beautiful loaves.</p>
-      <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80" alt="Bread baking">
-      <h2>The Role of Gluten</h2>
-      <p>When flour is mixed with water, two proteins — glutenin and gliadin — combine to form gluten. This network of stretchy proteins is what allows bread dough to trap the gases produced by yeast, enabling the loaf to rise. The more you knead or fold the dough, the more organized and strong this gluten network becomes.</p>
-      <p>Different flours contain different levels of protein. Bread flour, with 12–14% protein, creates a stronger gluten network than all-purpose flour (10–12%). Whole wheat flour contains bran, which can cut through gluten strands, which is why whole-grain loaves are often denser. Understanding protein content helps you choose the right flour for the texture you want.</p>
-      <img src="https://images.unsplash.com/photo-1549931319-a545dcf3bc7c?w=800&auto=format&fit=crop&q=80" alt="Dough kneading">
-      <h2>Yeast and Fermentation</h2>
-      <p>Yeast is a living organism, and its behavior is deeply influenced by temperature. At around 25–27°C (77–80°F), yeast is most active, consuming sugars and producing carbon dioxide and alcohol. This process is fermentation, and it's responsible not only for the rise of your bread but also for its flavor.</p>
-      <p>Slow, cold fermentation — proofing dough in the refrigerator overnight — produces far more complex flavors than a quick room-temperature rise. The extended time allows enzymes to break down starches and proteins, creating hundreds of flavor compounds. This is the secret behind great sourdough and long-fermented baguettes.</p>
-      <h2>The Maillard Reaction and Caramelization</h2>
-      <p>That gorgeous golden-brown crust is the product of two reactions happening simultaneously. The Maillard reaction occurs above 140°C (285°F), when amino acids and sugars react to create hundreds of new flavor compounds — the complex, roasty, slightly bitter notes that make a good crust irresistible. Caramelization happens slightly above that, adding sweetness and color.</p>
-      <p>To encourage crust development, bakers use steam in the first phase of baking. Steam keeps the surface of the dough moist and extensible during oven spring, allowing maximum rise before the crust sets. Without steam, the surface dries out too quickly, restricting rise and producing a pale, thick crust. Home bakers can replicate this by baking in a covered Dutch oven.</p>
-    `,
+    content: `<p>Bread is perhaps humanity's oldest prepared food, yet even experienced bakers sometimes struggle to understand why a loaf succeeds or fails. The good news is that bread baking is not magic — it's science, and once you understand the underlying chemistry, you'll be able to troubleshoot problems, improvise confidently, and bake consistently beautiful loaves.</p><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80" alt="Bread baking"><h2>The Role of Gluten</h2><p>When flour is mixed with water, two proteins — glutenin and gliadin — combine to form gluten. This network of stretchy proteins is what allows bread dough to trap the gases produced by yeast, enabling the loaf to rise. The more you knead or fold the dough, the more organized and strong this gluten network becomes.</p><h2>Yeast and Fermentation</h2><p>Yeast is a living organism, and its behavior is deeply influenced by temperature. At around 25–27°C (77–80°F), yeast is most active, consuming sugars and producing carbon dioxide and alcohol. Slow, cold fermentation produces far more complex flavors than a quick room-temperature rise.</p>`,
     faqs: [
       {q: "Why does my bread not rise?", a: "The most common culprits are dead yeast, water that's too hot or cold, or insufficient kneading. Always proof your yeast first if in doubt."},
       {q: "What's the ideal internal temperature for baked bread?", a: "Most bread is fully baked at 93–98°C (200–210°F) internally. Use an instant-read thermometer for accuracy."},
-      {q: "Why does my bread have large holes in strange places?", a: "Uneven fermentation or improper shaping can cause irregular holes. Degas the dough thoroughly when shaping."},
-      {q: "Can I substitute instant yeast for active dry yeast?", a: "Yes. Use 25% less instant yeast than the amount of active dry yeast called for, and you don't need to proof it in water first."},
-      {q: "Why is my crust soft after cooling?", a: "Moisture escaping from the crumb can soften the crust. Cool bread on a wire rack in a well-ventilated area without covering."}
+      {q: "Can I substitute instant yeast for active dry yeast?", a: "Yes. Use 25% less instant yeast than the amount of active dry yeast called for, and you don't need to proof it in water first."}
     ],
-    keyTakeaways: ["Gluten is formed when flour proteins meet water — kneading organizes and strengthens it", "Bread flour's higher protein content creates better structure", "Cold fermentation produces dramatically better flavor", "Steam in the oven enables maximum oven spring and a thin, shatteringly crisp crust", "The Maillard reaction creates the complex flavors and color of the crust"],
-    conclusion: "Every loaf of bread tells a story of chemistry and time. When you understand why each step matters — why you rest the dough, why you slash the top, why you need that steam — baking transforms from following a recipe into having a genuine conversation with ingredients. The next time your bread comes out of the oven, you won't just see a loaf — you'll see science, patience, and craftsmanship in golden form."
+    keyTakeaways: ["Gluten is formed when flour proteins meet water — kneading organizes and strengthens it", "Cold fermentation produces dramatically better flavor", "Steam in the oven enables maximum oven spring and a thin, crisp crust", "The Maillard reaction creates the complex flavors and color of the crust"],
+    conclusion: "Every loaf of bread tells a story of chemistry and time. When you understand why each step matters, baking transforms from following a recipe into having a genuine conversation with ingredients."
   },
   {
     title: "A Deep Dive into the World of Fermented Foods",
@@ -1514,29 +1742,13 @@ const blogs = [
     readTime: 10,
     image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=900&auto=format&fit=crop&q=80",
     excerpt: "From kimchi to kefir, explore how fermented foods have nourished humanity for millennia and how they can transform your gut health, cooking, and overall wellbeing.",
-    content: `
-      <p>Fermentation is the original food preservation technique, one that humanity has relied upon for thousands of years. Long before refrigerators, humans discovered that certain transformations — aided by bacteria, yeasts, and molds — could extend the life of food while creating extraordinary new flavors and textures. Today, we understand that these ancient foods also carry profound health benefits.</p>
-      <img src="https://images.unsplash.com/photo-1615485737031-5a9e5fb99f2c?w=800&auto=format&fit=crop&q=80" alt="Fermented foods">
-      <h2>What Is Fermentation?</h2>
-      <p>Fermentation is a metabolic process in which microorganisms — bacteria, yeasts, and fungi — convert carbohydrates into alcohols, gases, or acids. In the context of food, this transformation is both preservative (the acids and alcohol inhibit harmful bacteria) and generative — creating new flavors, textures, and nutrients that were not present in the original ingredients.</p>
-      <p>Different types of fermentation produce different results. Lactic acid fermentation, carried out by Lactobacillus bacteria, produces sour foods like yogurt, sauerkraut, kimchi, and sourdough bread. Alcoholic fermentation by yeasts produces beer, wine, and spirits. Acetic acid fermentation converts alcohol into vinegar. Each pathway produces its own distinctive flavor profile and health properties.</p>
-      <h2>The Gut Microbiome Connection</h2>
-      <p>The human gut is home to approximately 100 trillion microorganisms — collectively called the gut microbiome. Research increasingly shows that the diversity and balance of this microbial community is central to our physical and mental health, influencing immunity, digestion, mood, and even cognitive function.</p>
-      <p>Fermented foods deliver live beneficial bacteria (probiotics) directly to the gut, potentially enriching its microbial diversity. They also contain prebiotics — dietary fibers that feed beneficial bacteria — and postbiotics, including short-chain fatty acids that nourish the gut lining. A 2021 Stanford study found that a high-fermented-food diet significantly increased gut microbiome diversity while decreasing markers of inflammation.</p>
-      <img src="https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800&auto=format&fit=crop&q=80" alt="Healthy food">
-      <h2>Global Fermented Foods to Try</h2>
-      <p>Every food culture on earth has developed its own fermented traditions. Korean kimchi — cabbage and vegetables fermented with gochugaru, garlic, and ginger — is perhaps the world's most famous fermented vegetable dish. Japanese miso and soy sauce are cornerstone umami ingredients created through fungal fermentation. Eastern European kefir is a probiotic-rich fermented milk drink.</p>
-      <p>In West Africa, locust beans (dawadawa) are fermented to create a powerfully flavored condiment. In Ethiopia, injera flatbread is made from fermented teff flour. In India, dosa and idli batters are fermented overnight, not only for flavor but to increase the bioavailability of nutrients. The diversity of human fermentation traditions is staggering and endlessly fascinating.</p>
-    `,
+    content: `<p>Fermentation is the original food preservation technique, one that humanity has relied upon for thousands of years. Long before refrigerators, humans discovered that certain transformations — aided by bacteria, yeasts, and molds — could extend the life of food while creating extraordinary new flavors and textures.</p><img src="https://images.unsplash.com/photo-1615485737031-5a9e5fb99f2c?w=800&auto=format&fit=crop&q=80" alt="Fermented foods"><h2>What Is Fermentation?</h2><p>Fermentation is a metabolic process in which microorganisms convert carbohydrates into alcohols, gases, or acids. Different types of fermentation produce different results. Lactic acid fermentation produces sour foods like yogurt, sauerkraut, kimchi, and sourdough bread.</p><h2>The Gut Microbiome Connection</h2><p>The human gut is home to approximately 100 trillion microorganisms. Fermented foods deliver live beneficial bacteria directly to the gut, potentially enriching its microbial diversity.</p>`,
     faqs: [
-      {q: "Are all fermented foods probiotic?", a: "Not necessarily. Only fermented foods that still contain live cultures when consumed deliver probiotics. Pasteurized sauerkraut, for example, has the beneficial bacteria killed by heat."},
-      {q: "Is it safe to ferment food at home?", a: "Yes, when done properly. Lactic acid fermentation is very safe — the acid produced inhibits harmful pathogens. Always use clean equipment and keep vegetables submerged under brine."},
-      {q: "How much fermented food should I eat daily?", a: "Most research suggests 1–3 servings of fermented foods per day is beneficial. Start small if you're new to it, as some people experience bloating initially."},
-      {q: "Can fermented foods help with lactose intolerance?", a: "Yes! The bacteria in yogurt and kefir break down much of the lactose, making these foods more tolerable for people with lactose sensitivity."},
-      {q: "Does cooking fermented food destroy its probiotics?", a: "Heating above 46°C kills most beneficial bacteria. Enjoy fermented foods raw or add them after cooking to preserve probiotic benefits."}
+      {q: "Are all fermented foods probiotic?", a: "Not necessarily. Only fermented foods that still contain live cultures when consumed deliver probiotics. Pasteurized sauerkraut has the bacteria killed by heat."},
+      {q: "Is it safe to ferment food at home?", a: "Yes, when done properly. Lactic acid fermentation is very safe — the acid produced inhibits harmful pathogens."}
     ],
-    keyTakeaways: ["Fermentation is an ancient preservation method that creates new flavors and nutrients", "Lactic acid, alcoholic, and acetic acid fermentations produce very different results", "Regular consumption of fermented foods can support gut microbiome diversity", "Every food culture has developed unique fermentation traditions", "Making fermented foods at home is safe, affordable, and deeply rewarding"],
-    conclusion: "Embracing fermented foods is one of the most impactful dietary changes you can make — not only for your health but for your palate. The complex, layered flavors of properly fermented foods are unlike anything that comes from a factory. Whether you start with a simple jar of lacto-fermented vegetables or venture into sourdough baking, you'll be joining a tradition that stretches back to the very roots of human civilization."
+    keyTakeaways: ["Fermentation is an ancient preservation method that creates new flavors and nutrients", "Lactic acid, alcoholic, and acetic acid fermentations produce very different results", "Regular consumption of fermented foods can support gut microbiome diversity"],
+    conclusion: "Embracing fermented foods is one of the most impactful dietary changes you can make — not only for your health but for your palate."
   },
   {
     title: "Knife Skills: Everything a Home Cook Needs to Know",
@@ -1545,29 +1757,13 @@ const blogs = [
     readTime: 8,
     image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=900&auto=format&fit=crop&q=80",
     excerpt: "A sharp knife and the right technique can transform your cooking experience. Learn the essential cuts, safe practices, and how to keep your blades in peak condition.",
-    content: `
-      <p>Ask any professional chef what their most important kitchen tool is, and the answer is almost always the same: a good knife. More than any gadget or appliance, knife skills are the foundation of efficient, enjoyable cooking. Yet most home cooks have never formally learned how to hold, use, or care for a knife properly.</p>
-      <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&auto=format&fit=crop&q=80" alt="Knife skills">
-      <h2>The Right Knife for the Job</h2>
-      <p>A good kitchen knife collection doesn't need to be large — in fact, most cooks can do everything they need with just three knives. A chef's knife (20–25cm) handles the vast majority of tasks: chopping, slicing, dicing, and mincing. A paring knife (8–10cm) is ideal for precise work like peeling and trimming. A serrated bread knife makes quick work of crusty loaves without crushing the crumb.</p>
-      <p>The debate between German and Japanese knives is worth understanding. German knives like Wüsthof and Henckels are thicker, heavier, and more flexible — they excel at tough tasks and are very forgiving. Japanese knives are typically thinner and harder, holding an edge longer but requiring more careful use. For most beginners, a German-style chef's knife is more practical and durable.</p>
-      <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&auto=format&fit=crop&q=80" alt="Chef knife">
-      <h2>The Pinch Grip</h2>
-      <p>The single most important thing you can learn is the correct way to hold a knife. Forget the handle grip — professionals use the pinch grip. Place your thumb on one side of the blade where it meets the handle, and pinch with your index finger on the other side. Your remaining three fingers wrap comfortably around the handle. This grip gives you far greater control and reduces fatigue.</p>
-      <p>Your non-dominant hand forms the "claw" — fingers curled under, knuckles guiding the blade. The flat of the blade rests against your knuckles as you slice, creating a natural guide while keeping your fingertips safely tucked away. This technique takes perhaps an hour to feel natural, and once learned, it becomes completely automatic.</p>
-      <h2>Essential Cuts Every Cook Should Master</h2>
-      <p>The julienne — thin matchstick cuts — adds elegance and maximizes surface area for stir-fries and salads. The brunoise is a tiny 3mm dice, produced by first julienning then cutting across. The chiffonade is used for leafy herbs: stack leaves, roll tightly, and slice into thin ribbons. The rough chop is the workhorse cut — imprecise but fast, perfect for aromatics going into soups or stews.</p>
-      <p>Mincing garlic and herbs efficiently takes practice. Rock the blade in a fan motion, keeping the tip on the board while the heel rises and falls. Occasionally gather the pieces back to the center with the blade. Within a minute, you can reduce an entire bulb of garlic to a fine mince.</p>
-    `,
+    content: `<p>Ask any professional chef what their most important kitchen tool is, and the answer is almost always the same: a good knife. More than any gadget or appliance, knife skills are the foundation of efficient, enjoyable cooking.</p><img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&auto=format&fit=crop&q=80" alt="Knife skills"><h2>The Right Knife for the Job</h2><p>A good kitchen knife collection doesn't need to be large — in fact, most cooks can do everything they need with just three knives. A chef's knife (20–25cm) handles the vast majority of tasks. A paring knife (8–10cm) is ideal for precise work. A serrated bread knife makes quick work of crusty loaves.</p><h2>The Pinch Grip</h2><p>The single most important thing you can learn is the correct way to hold a knife. Forget the handle grip — professionals use the pinch grip. Place your thumb on one side of the blade where it meets the handle, and pinch with your index finger on the other side.</p>`,
     faqs: [
       {q: "How often should I sharpen my knives?", a: "Hone with a honing steel before each use. Sharpen with a whetstone or send to a professional every 6–12 months depending on use frequency."},
-      {q: "What's the difference between honing and sharpening?", a: "Honing realigns the microscopic edge of the blade. Sharpening removes metal to create a new edge. Both are necessary for peak performance."},
-      {q: "Should knives go in the dishwasher?", a: "Never. Dishwashers dull and damage knife edges, and may loosen handles. Always hand wash and dry immediately."},
-      {q: "What's the best cutting board material?", a: "Wooden or bamboo boards are gentlest on knife edges. Plastic is hygienic and dishwasher-safe. Avoid glass, ceramic, or marble, which destroy edges."},
-      {q: "How do I know when a knife needs sharpening?", a: "Try the paper test: a sharp knife should glide through a sheet of paper cleanly. If it tears or deflects, it's time to sharpen."}
+      {q: "Should knives go in the dishwasher?", a: "Never. Dishwashers dull and damage knife edges, and may loosen handles. Always hand wash and dry immediately."}
     ],
-    keyTakeaways: ["Three knives — chef's, paring, and serrated — cover nearly all home cooking needs", "The pinch grip provides maximum control and reduces hand fatigue", "Master the claw technique to protect your fingers while cutting", "Hone before each use; sharpen every 6–12 months", "Never put knives in the dishwasher — always hand wash and dry immediately"],
-    conclusion: "Investing time in learning proper knife skills is one of the highest-return improvements a home cook can make. When your knife glides effortlessly through an onion and your cuts are uniform, cooking stops feeling like a chore and starts feeling like a craft. Spend an afternoon practicing your grip and basic cuts, and you'll notice an immediate difference in both your speed and your results."
+    keyTakeaways: ["Three knives — chef's, paring, and serrated — cover nearly all home cooking needs", "The pinch grip provides maximum control and reduces hand fatigue", "Hone before each use; sharpen every 6–12 months", "Never put knives in the dishwasher — always hand wash and dry immediately"],
+    conclusion: "Investing time in learning proper knife skills is one of the highest-return improvements a home cook can make. When your knife glides effortlessly through an onion, cooking stops feeling like a chore and starts feeling like a craft."
   },
   {
     title: "The Complete Guide to Building a Pantry from Scratch",
@@ -1576,29 +1772,13 @@ const blogs = [
     readTime: 9,
     image: "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=900&auto=format&fit=crop&q=80",
     excerpt: "A well-stocked pantry is the difference between a cook who thrives and one who struggles. Discover the essential ingredients that will transform your ability to cook spontaneously and creatively.",
-    content: `
-      <p>A great pantry is not built overnight — it's assembled intentionally over time, each ingredient chosen because it expands your cooking possibilities. Unlike a refrigerator full of ingredients that will go bad in days, a well-stocked pantry is your permanent culinary infrastructure: the foundation upon which you can build any meal, any time.</p>
-      <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=80" alt="Pantry">
-      <h2>The Flavor Foundations</h2>
-      <p>Every pantry should start with the building blocks of flavor. Sea salt and freshly ground black pepper are non-negotiable. Beyond these, stock a variety of acids — good quality red and white wine vinegar, apple cider vinegar, and rice wine vinegar each have distinct characters that suit different dishes. Citrus (lemons and limes) belongs in your kitchen at all times; their zest and juice brighten virtually every dish.</p>
-      <p>Fats are equally important. Extra virgin olive oil for Mediterranean cooking, neutral oils (grapeseed or sunflower) for high-heat searing, toasted sesame oil for finishing Asian dishes, and butter — always real, unsalted butter — for baking and European cooking. These four fats cover the vast majority of culinary traditions.</p>
-      <img src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=800&auto=format&fit=crop&q=80" alt="Spices">
-      <h2>Umami Amplifiers</h2>
-      <p>Umami — the fifth taste — is the secret to making food taste deeply satisfying rather than just adequate. Build a collection of umami-rich pantry items: soy sauce (both regular and tamari for gluten-free), fish sauce (a small splash transforms countless dishes, even in non-Asian cooking), Worcestershire sauce, tomato paste, Marmite or Vegemite, and anchovy fillets in oil. Dried mushrooms — porcini or shiitake — add an extraordinary depth of savory flavor to soups, stews, and sauces.</p>
-      <p>Parmesan rind deserves special mention: save them in the freezer and add to soups and stocks for a burst of umami that no bouillon cube can replicate. Similarly, a tin of high-quality tomatoes — San Marzano DOP if possible — makes an enormous difference in slow-cooked sauces.</p>
-      <h2>Spices: The Soul of Your Pantry</h2>
-      <p>Spices are fragile — their aromatic compounds degrade with time, heat, and light. Buy small quantities of whole spices when possible and grind them as needed. At minimum, stock: cumin (whole and ground), coriander, turmeric, smoked and sweet paprika, cinnamon, cardamom, dried chili flakes, and bay leaves. For Indian cooking, add black mustard seeds, fenugreek, and asafoetida.</p>
-      <p>Toast whole spices before grinding to dramatically intensify their flavor. A dry pan over medium heat, 60 seconds stirring, and your kitchen will smell like a Marrakech spice market. Store spices away from heat and light — not in a rack beside the stove, where they degrade rapidly.</p>
-    `,
+    content: `<p>A great pantry is not built overnight — it's assembled intentionally over time, each ingredient chosen because it expands your cooking possibilities.</p><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=80" alt="Pantry"><h2>The Flavor Foundations</h2><p>Every pantry should start with the building blocks of flavor. Sea salt and freshly ground black pepper are non-negotiable. Beyond these, stock a variety of acids — good quality vinegars each have distinct characters that suit different dishes.</p><h2>Umami Amplifiers</h2><p>Build a collection of umami-rich pantry items: soy sauce, fish sauce, Worcestershire sauce, tomato paste, and dried mushrooms add extraordinary depth of savory flavor to soups, stews, and sauces.</p>`,
     faqs: [
       {q: "How long do pantry staples last?", a: "Dried spices: 1–3 years. Canned goods: 2–5 years. Dried pasta, rice: 2 years. Oils: 1–2 years. Always check for off smells or flavors."},
-      {q: "What grains should every pantry have?", a: "Arborio rice for risotto, basmati for Indian dishes, jasmine for Asian cooking, along with dried pasta in at least two shapes, lentils, and chickpeas."},
-      {q: "Is it worth spending more on premium pantry items?", a: "For core ingredients you use daily (olive oil, canned tomatoes, soy sauce), yes. Quality makes a perceptible difference. For things used occasionally, mid-range is fine."},
-      {q: "How should I store opened canned goods?", a: "Transfer to an airtight glass or plastic container and refrigerate. Use within 3–4 days. Never store in the original tin once opened."},
-      {q: "What's the most underrated pantry ingredient?", a: "White miso paste. It adds deep savory flavor to everything from soups to salad dressings, marinades, and even caramel. Store in the fridge where it keeps for months."}
+      {q: "What's the most underrated pantry ingredient?", a: "White miso paste. It adds deep savory flavor to everything from soups to salad dressings, marinades, and even caramel."}
     ],
-    keyTakeaways: ["Start with salt, pepper, acids, and four essential fats", "Umami amplifiers (soy sauce, fish sauce, tomato paste) make food taste more satisfying", "Whole spices kept in a cool, dark place retain flavor far longer than ground", "Quality matters most for core ingredients used daily", "A good pantry enables spontaneous, creative cooking without pre-planning"],
-    conclusion: "A thoughtfully stocked pantry is the most enabling investment you can make in your cooking. When your shelves are well-organized and filled with quality, versatile ingredients, you'll find yourself reaching for restaurants less and your own kitchen more. The creative freedom that comes from being able to look at what you have and improvise a meal is one of cooking's greatest pleasures — and it starts with your pantry."
+    keyTakeaways: ["Start with salt, pepper, acids, and four essential fats", "Umami amplifiers make food taste more satisfying", "Quality matters most for core ingredients used daily", "A good pantry enables spontaneous, creative cooking"],
+    conclusion: "A thoughtfully stocked pantry is the most enabling investment you can make in your cooking. The creative freedom that comes from being able to improvise a meal is one of cooking's greatest pleasures."
   },
   {
     title: "The World of Umami: Cooking's Most Mysterious Flavor",
@@ -1607,29 +1787,13 @@ const blogs = [
     readTime: 8,
     image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=900&auto=format&fit=crop&q=80",
     excerpt: "Discover the science behind umami — the fifth taste — and learn how to harness it to create deeply satisfying, craveable dishes that keep people coming back for more.",
-    content: `
-      <p>For most of Western culinary history, we recognized four basic tastes: sweet, salty, sour, and bitter. Then in 1908, a Japanese chemist named Kikunae Ikeda was eating a bowl of dashi — a simple broth of kombu seaweed — and was struck by an entirely different sensation. It was neither sweet, nor salty, nor sour, nor bitter. It was rich, savory, mouth-coating, and lingering. He called it <em>umami</em> — a Japanese word combining "delicious" and "taste."</p>
-      <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&auto=format&fit=crop&q=80" alt="Umami food">
-      <h2>The Science of the Fifth Taste</h2>
-      <p>Ikeda identified the compound responsible for umami as glutamate — specifically glutamic acid, an amino acid found in many protein-rich foods. In 2001, scientists discovered specific taste receptors on the human tongue that respond to glutamate, confirming umami as a genuine, physiologically distinct taste rather than merely a cultural perception.</p>
-      <p>Beyond glutamate, two nucleotides — inosinate (IMP) and guanylate (GMP) — also trigger umami receptors. The fascinating discovery is that these compounds have a synergistic effect: combining glutamate with IMP or GMP produces an umami sensation up to eight times stronger than either compound alone. This is why a Parmesan-crusted chicken tastes more savory than the sum of its parts.</p>
-      <img src="https://images.unsplash.com/photo-1515443961218-a51367888e4b?w=800&auto=format&fit=crop&q=80" alt="Japanese food">
-      <h2>High-Umami Foods You Should Be Cooking With</h2>
-      <p>Umami is most concentrated in aged, fermented, or dried foods — processes that break down proteins and release free glutamate. Aged Parmigiano-Reggiano contains nearly 1,200mg of glutamate per 100g, making it one of the most umami-rich foods in the world. Dried shiitake mushrooms, rich in guanylate, and tuna, rich in inosinate, create extraordinary synergistic effects when combined.</p>
-      <p>Fish sauce and soy sauce are liquid umami — highly concentrated, fermented condiments that deliver intense savoriness in drops. Even in non-Asian dishes, a teaspoon of fish sauce added to a Bolognese sauce or a stew elevates the entire dish without tasting "fishy." Tomatoes — especially sun-dried or slow-roasted — are unexpectedly high in glutamate, which explains why tomato sauce is so universally appealing.</p>
-      <h2>Cooking Techniques That Amplify Umami</h2>
-      <p>Time and heat are powerful umami amplifiers. Slow roasting, braising, and long simmering break down proteins into amino acids, releasing glutamate. This is why a slow-cooked ragù is so much more satisfying than a quick meat sauce. Maillard browning also generates glutamate — another reason why properly seared meat tastes incomparably better than gray, steamed meat.</p>
-      <p>Layering umami sources — a stock made from roasted bones and dried mushrooms, finished with a splash of soy sauce and grated Parmesan — creates extraordinary depth of flavor. The synergistic effect means you use less of each individual ingredient while achieving more flavor impact.</p>
-    `,
+    content: `<p>For most of Western culinary history, we recognized four basic tastes: sweet, salty, sour, and bitter. Then in 1908, a Japanese chemist named Kikunae Ikeda was eating a bowl of dashi and was struck by an entirely different sensation. He called it <em>umami</em>.</p><h2>The Science of the Fifth Taste</h2><p>Ikeda identified the compound responsible for umami as glutamate — specifically glutamic acid, an amino acid found in many protein-rich foods. In 2001, scientists discovered specific taste receptors on the human tongue that respond to glutamate.</p><h2>High-Umami Foods You Should Be Cooking With</h2><p>Umami is most concentrated in aged, fermented, or dried foods. Aged Parmigiano-Reggiano contains nearly 1,200mg of glutamate per 100g, making it one of the most umami-rich foods in the world.</p>`,
     faqs: [
       {q: "Is MSG the same as umami?", a: "MSG (monosodium glutamate) is the sodium salt of glutamic acid and one of the purest sources of umami. Research shows it is safe in normal food quantities."},
-      {q: "Can vegetarians and vegans get umami in their food?", a: "Absolutely. Mushrooms, tomatoes, miso, soy sauce, nutritional yeast, and seaweed are all vegan umami powerhouses."},
-      {q: "Why does food with lots of umami taste 'craveable'?", a: "Umami signals to the brain that food is protein-rich and nutritious. It stimulates saliva production and lingers on the palate, making food memorable and satisfying."},
-      {q: "What's the easiest way to add umami to a dish?", a: "Add a small amount of soy sauce, fish sauce, Worcestershire sauce, or tomato paste. Even a teaspoon can transform a dish. Freshly grated Parmesan as a finisher also works wonders."},
-      {q: "Does overcooking destroy umami?", a: "Not exactly, but excessive cooking can diminish delicate flavors that accompany umami. Moderate heat for sufficient time is the ideal for maximum umami development."}
+      {q: "Can vegetarians and vegans get umami in their food?", a: "Absolutely. Mushrooms, tomatoes, miso, soy sauce, nutritional yeast, and seaweed are all vegan umami powerhouses."}
     ],
-    keyTakeaways: ["Umami is the fifth basic taste, triggered by glutamate and certain nucleotides", "Glutamate + nucleotides create synergistic flavor effects up to 8x stronger", "Aged, fermented, and dried foods are highest in umami", "Cooking techniques like browning, roasting, and slow simmering amplify umami", "Even a small addition of a high-umami ingredient can transform a dish"],
-    conclusion: "Once you understand umami, you'll start to see patterns in the world's most satisfying dishes — why Italian cooking leans so heavily on Parmesan and anchovies, why Japanese cuisine is built on dashi, why aged cheeses are universally beloved. Armed with this knowledge, you can deliberately engineer dishes with irresistible, complex, lingering flavor. Cook with umami in mind, and your food will never be bland again."
+    keyTakeaways: ["Umami is the fifth basic taste, triggered by glutamate and certain nucleotides", "Aged, fermented, and dried foods are highest in umami", "Cooking techniques like browning and slow simmering amplify umami"],
+    conclusion: "Once you understand umami, you'll start to see patterns in the world's most satisfying dishes. Cook with umami in mind, and your food will never be bland again."
   },
   {
     title: "Mastering French Sauces: The Five Mother Sauces",
@@ -1637,30 +1801,14 @@ const blogs = [
     date: "Jan 31, 2026",
     readTime: 12,
     image: "https://images.unsplash.com/photo-1548940740-204726a19be3?w=900&auto=format&fit=crop&q=80",
-    excerpt: "French cuisine's five mother sauces are the foundation of classical cooking. Master these and you'll have the tools to create hundreds of derivative sauces and elevate any dish.",
-    content: `
-      <p>In 19th-century France, the legendary chef Marie-Antoine Carême codified a system of sauces that would become the backbone of Western culinary tradition. He identified four "grande sauces" which were later expanded to five by Auguste Escoffier. These mother sauces — Béchamel, Velouté, Espagnole, Sauce Tomat, and Hollandaise — are so-named because from each one, dozens of daughter sauces can be derived.</p>
-      <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&auto=format&fit=crop&q=80" alt="French sauces">
-      <h2>Béchamel: The White Sauce</h2>
-      <p>Béchamel is the simplest mother sauce — a roux (equal parts butter and flour cooked together) enriched with warm milk. The ratio is typically 60g butter + 60g flour per liter of milk. Cook the roux until it smells slightly nutty but remains pale (about 2 minutes), then add warm milk gradually, whisking constantly to prevent lumps. Season with salt, white pepper, and a pinch of nutmeg.</p>
-      <p>From Béchamel flows an impressive family: Mornay sauce (with Gruyère and Parmesan, perfect for gratins), Soubise (with puréed onions), Nantua (with crayfish butter), and cream sauce (with added heavy cream and a reduction). Béchamel also forms the base of classic lasagne and croque monsieur.</p>
-      <h2>Velouté: The Blond Sauce</h2>
-      <p>Velouté (French for "velvety") begins the same way as Béchamel — with a roux — but is enriched with white stock (chicken, fish, or veal) instead of milk. The stock must be clear and flavorful. A classic chicken velouté uses a pale roux cooked with rich chicken stock, simmered until silky and coating.</p>
-      <p>Derivative sauces include Suprême sauce (velouté + cream and mushroom, served with poultry), Allemande (with egg yolks for richness), and Bercy (with wine and shallots for fish). Velouté is a more sophisticated, refined sauce than Béchamel, with the complex flavor of a good stock behind it.</p>
-      <img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&auto=format&fit=crop&q=80" alt="Sauce preparation">
-      <h2>Espagnole: The Brown Sauce</h2>
-      <p>Espagnole is the most complex mother sauce — a deeply flavored brown sauce made from a dark roux, brown veal stock, tomatoes, and mirepoix (onion, carrot, celery). It's simmered for hours and traditionally refined into Demi-Glace, which requires reducing the Espagnole with additional stock to a concentrated, glossy, deeply savory sauce.</p>
-      <p>From Espagnole and Demi-Glace come the great red wine sauces of French cuisine: Bordelaise (with Bordeaux wine and bone marrow), Chasseur (hunter's sauce with mushrooms and tomatoes), Madère (with Madeira wine), and Robert (with white wine, onions, and mustard). These are the sauces that accompany roasted and grilled meats in the finest restaurants.</p>
-    `,
+    excerpt: "French cuisine's five mother sauces are the foundation of classical cooking. Master these and you'll have the tools to create hundreds of derivative sauces.",
+    content: `<p>In 19th-century France, the legendary chef Marie-Antoine Carême codified a system of sauces that would become the backbone of Western culinary tradition. These mother sauces — Béchamel, Velouté, Espagnole, Sauce Tomat, and Hollandaise — are so-named because from each one, dozens of daughter sauces can be derived.</p><h2>Béchamel: The White Sauce</h2><p>Béchamel is the simplest mother sauce — a roux enriched with warm milk. The ratio is typically 60g butter + 60g flour per liter of milk. Cook the roux until it smells slightly nutty but remains pale, then add warm milk gradually, whisking constantly to prevent lumps.</p><h2>Velouté: The Blond Sauce</h2><p>Velouté begins the same way as Béchamel — with a roux — but is enriched with white stock instead of milk. The stock must be clear and flavorful.</p>`,
     faqs: [
-      {q: "What is a roux and how do I make one?", a: "A roux is equal weights butter and flour cooked together. Melt butter, add flour, cook stirring constantly for 1–5 minutes depending on desired color (white, blonde, or dark)."},
-      {q: "Can I make these sauces in advance?", a: "Yes! Most mother sauces reheat beautifully. Béchamel and Velouté keep for 3 days refrigerated. Espagnole/Demi-Glace freezes excellently for 3 months."},
-      {q: "What's Hollandaise and why is it different?", a: "Hollandaise is an emulsion sauce made by whisking egg yolks with melted butter and lemon. Unlike the others, it's not roux-based and must be made fresh as it doesn't hold well."},
-      {q: "Why does my Béchamel have lumps?", a: "Usually because cold milk was added too quickly to hot roux. Always use warm milk and add it in a slow, steady stream while whisking continuously."},
-      {q: "Is Sauce Tomat just tomato sauce?", a: "It's more than that — it includes salt pork, vegetables, and stock alongside tomatoes. The result is a richer, more complex sauce than simple Italian-style tomato sauce."}
+      {q: "What is a roux and how do I make one?", a: "A roux is equal weights butter and flour cooked together. Melt butter, add flour, cook stirring constantly for 1–5 minutes depending on desired color."},
+      {q: "Why does my Béchamel have lumps?", a: "Usually because cold milk was added too quickly to hot roux. Always use warm milk and add it in a slow, steady stream while whisking continuously."}
     ],
-    keyTakeaways: ["The five mother sauces are Béchamel, Velouté, Espagnole, Sauce Tomat, and Hollandaise", "Each mother sauce is a base from which dozens of derivative 'daughter' sauces spring", "A good roux is the foundation of most — cook it properly to avoid a raw flour taste", "Quality stock is essential for Velouté and Espagnole — homemade is always superior", "Mastering these sauces gives you a classical vocabulary that applies across Western cooking"],
-    conclusion: "The mother sauces can feel intimidating, but approach them one at a time and they quickly become second nature. Start with Béchamel — it's the most forgiving and immediately useful — and work your way through each. Understanding these foundational preparations will change how you think about cooking: instead of following recipes, you'll begin to understand the principles behind them, freeing you to improvise and create with genuine confidence."
+    keyTakeaways: ["The five mother sauces are Béchamel, Velouté, Espagnole, Sauce Tomat, and Hollandaise", "Each mother sauce is a base from which dozens of derivative sauces spring", "Quality stock is essential for Velouté and Espagnole"],
+    conclusion: "The mother sauces can feel intimidating, but approach them one at a time and they quickly become second nature. Understanding these foundational preparations will change how you think about cooking."
   },
   {
     title: "Seasonal Eating: How to Cook with What's at Peak",
@@ -1669,28 +1817,13 @@ const blogs = [
     readTime: 9,
     image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900&auto=format&fit=crop&q=80",
     excerpt: "Seasonal eating is not just an environmental choice — it's a culinary philosophy that produces superior flavor, supports local farmers, and reconnects you with the natural rhythms of food.",
-    content: `
-      <p>There's a reason why a tomato picked in August from a sun-drenched garden tastes nothing like the pale, watery supermarket tomato bought in February. Seasonal produce harvested at its peak contains the maximum concentration of flavor compounds, natural sugars, and nutrients that the plant has been building throughout its growing cycle. Eating seasonally isn't a trend — it's simply cooking at its most logical and delicious.</p>
-      <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=80" alt="Seasonal vegetables">
-      <h2>Why Seasons Matter for Flavor</h2>
-      <p>Modern supply chains have made virtually every ingredient available year-round, but at a cost. Out-of-season produce is typically harvested early (before peak flavor development) and transported thousands of miles in refrigerated containers. During this process, enzymatic reactions continue and aromatics degrade. What arrives at the supermarket looks acceptable but tastes hollow.</p>
-      <p>Contrast this with a carrot pulled from cold winter soil, still speckled with earth. The plant has been slowly concentrating its sugars and carbohydrates as a natural antifreeze response. The result is a carrot of extraordinary sweetness and intensity — one that needs nothing more than good butter and a pinch of salt to become a memorable dish.</p>
-      <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&auto=format&fit=crop&q=80" alt="Farmers market">
-      <h2>A Season-by-Season Guide</h2>
-      <p>Spring brings asparagus, peas, fava beans, morel mushrooms, spring onions, and the first salad leaves. It's a season of fresh green flavors and delicacy — perfect for light preparations that let the ingredients speak. Early strawberries and rhubarb arrive late in the season, signaling the transition to summer's abundance.</p>
-      <p>Summer is the most exuberant season: tomatoes, courgettes, aubergines, peppers, corn, stone fruits, and berries all arrive in quick succession. This is the time for Mediterranean cooking — simple preparations that require little more than quality olive oil, salt, and perhaps some fresh herbs. Summer produce is so flavorful it needs the cook to step back and let it shine.</p>
-      <p>Autumn's harvest is the most varied and exciting: squashes, root vegetables, wild mushrooms, pears, apples, quinces, chestnuts, and the last of the tomatoes. It's a season that calls for slow cooking — braises, roasts, and stews that fill the house with warmth. Game meats are in season, traditionally paired with the wild mushrooms and root vegetables of the season.</p>
-      <p>Winter, often dismissed as a sparse season, offers its own rewards. Citrus fruits are at their best — blood oranges, clementines, pomelos. Root vegetables sweeten further. Braising greens like cavolo nero, chard, and Brussels sprouts come into their own with cold. Preserved ingredients — pickles, jams, fermented vegetables — bridge the gap and celebrate summer's bounty in new forms.</p>
-    `,
+    content: `<p>There's a reason why a tomato picked in August from a sun-drenched garden tastes nothing like the pale, watery supermarket tomato bought in February. Seasonal produce harvested at its peak contains the maximum concentration of flavor compounds and natural sugars.</p><h2>Why Seasons Matter for Flavor</h2><p>Modern supply chains have made virtually every ingredient available year-round, but at a cost. Out-of-season produce is typically harvested early and transported thousands of miles in refrigerated containers.</p><h2>A Season-by-Season Guide</h2><p>Spring brings asparagus, peas, fava beans, morel mushrooms, and the first salad leaves. Summer is the most exuberant season: tomatoes, courgettes, aubergines, peppers, corn, stone fruits, and berries. Autumn brings squashes, root vegetables, wild mushrooms, and the last of the tomatoes.</p>`,
     faqs: [
       {q: "How do I know what's in season in my area?", a: "Visit your local farmers market — what's being sold is always seasonal and local. Alternatively, search for a seasonal produce calendar specific to your region."},
-      {q: "Does frozen produce count as seasonal?", a: "Frozen produce is often frozen at peak ripeness and retains most of its nutritional value, though some texture is lost. It's a great option for off-season cooking."},
-      {q: "Is seasonal always more expensive?", a: "Often the opposite — seasonal produce is plentiful and therefore cheaper. Out-of-season produce commands a premium because of transport costs and lower supply."},
-      {q: "How can I eat seasonally year-round without getting bored?", a: "Explore different varieties of seasonal items, experiment with new cuisines that feature your available ingredients, and learn preservation techniques to extend the season."},
-      {q: "Do I need to shop only at farmers markets?", a: "No — any local or regional producer, farm shop, or CSA box delivers seasonal produce. Even supermarkets clearly label their seasonal and locally sourced items."}
+      {q: "Is seasonal always more expensive?", a: "Often the opposite — seasonal produce is plentiful and therefore cheaper."}
     ],
-    keyTakeaways: ["Peak-season produce has superior flavor, nutrition, and often lower price", "Out-of-season produce is harvested early and loses flavor during long transport", "Each season has its own flavor character that should guide your cooking style", "Famers markets and CSA boxes are the easiest paths to seasonal cooking", "Preservation (pickling, freezing, fermenting) allows you to enjoy seasonal flavors year-round"],
-    conclusion: "When you align your cooking with the seasons, something magical happens. Cooking becomes anticipatory — you look forward to the first asparagus of spring, the summer tomato season, the autumn mushroom harvest. This anticipation is the opposite of the year-round monotony of supermarket shopping. And when you cook ingredients at their peak, even simple preparations become memorable. Let the seasons guide you, and your food will take care of itself."
+    keyTakeaways: ["Peak-season produce has superior flavor, nutrition, and often lower price", "Each season has its own flavor character that should guide your cooking style", "Preservation (pickling, freezing, fermenting) allows you to enjoy seasonal flavors year-round"],
+    conclusion: "When you align your cooking with the seasons, something magical happens. Cooking becomes anticipatory and your food takes care of itself."
   },
   {
     title: "The Butcher's Guide: Understanding Meat Cuts",
@@ -1698,30 +1831,14 @@ const blogs = [
     date: "Jan 17, 2026",
     readTime: 10,
     image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Navigate the butcher counter with confidence. Learn which cuts suit which cooking methods, how to spot quality, and why an adventurous approach to less common cuts produces extraordinary results.",
-    content: `
-      <p>For many home cooks, the meat counter is an intimidating place — a bewildering array of cuts with unfamiliar names and wildly varying prices. Yet understanding meat is fundamentally simple: it all comes down to where the cut comes from on the animal and how much work that muscle did during the animal's life.</p>
-      <img src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&auto=format&fit=crop&q=80" alt="Butcher">
-      <h2>The Working Muscle Principle</h2>
-      <p>Muscles that do a lot of work — the shoulders, legs, and neck — are tough and collagen-rich. They require long, slow, moist cooking to convert that collagen into gelatin, which gives slow-cooked dishes their silky, unctuous texture. Muscles that do little work — the loin, the rib — are tender and lean, ideal for quick, high-heat cooking methods that would destroy a working muscle.</p>
-      <p>This is why a fillet steak can be ruined by braising and a shoulder of lamb is wasted on a quick grill. Working with these principles rather than against them is the key to getting remarkable results from every cut you buy.</p>
-      <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&auto=format&fit=crop&q=80" alt="Steak">
-      <h2>Beef: From Nose to Tail</h2>
-      <p>Beef offers the widest range of cuts. At the premium end: fillet (the most tender, least flavorful), ribeye (beautifully marbled with fat, exceptional flavor), sirloin (a balance of tenderness and flavor), and T-bone (fillet and sirloin on one bone). These reward quick, high-heat cooking: a screaming hot pan or a grill with good char.</p>
-      <p>The secondary cuts — bavette (flank), onglet (hanger steak), and bavette d'aloyau — offer extraordinary flavor at a fraction of the cost. These cuts are beloved by chefs who know that a well-rested onglet, marinated briefly and cooked medium-rare, delivers flavor that rivals any premium steak. Working cuts for slow cooking include chuck (for stews and ground beef), brisket (for smoking and braising), and short ribs (for deep, gelatinous braises).</p>
-      <h2>The Case for Secondary Cuts</h2>
-      <p>The era of nose-to-tail cooking, championed by chefs like Fergus Henderson, has revived appreciation for cuts that were once discarded or relegated to pet food. Beef cheeks, braised for hours in red wine, produce a texture so silky and intense it can make a fine dining regular weep. Osso buco — cross-cut veal shins — is one of Italy's most celebrated dishes precisely because of its humble, working-muscle origins.</p>
-      <p>Lamb neck, pork belly, chicken thighs over breast — these are the choices of a cook who understands flavor and has moved beyond the tyranny of the prime cut. They're cheaper, more forgiving (it's hard to overcook a well-marbled braise), and often deliver superior depth of flavor. Start exploring secondary cuts and you'll quickly become their greatest advocate.</p>
-    `,
+    excerpt: "Navigate the butcher counter with confidence. Learn which cuts suit which cooking methods and why secondary cuts often produce extraordinary results.",
+    content: `<p>For many home cooks, the meat counter is an intimidating place. Yet understanding meat is fundamentally simple: it all comes down to where the cut comes from on the animal and how much work that muscle did.</p><h2>The Working Muscle Principle</h2><p>Muscles that do a lot of work — the shoulders, legs, and neck — are tough and collagen-rich. They require long, slow, moist cooking. Muscles that do little work — the loin, the rib — are tender and lean, ideal for quick, high-heat cooking.</p>`,
     faqs: [
-      {q: "How do I know if meat is fresh?", a: "Beef should be bright cherry-red (or dark purple if vacuum-packed), firm to touch, and have a clean, mild smell. Avoid meat that smells sour or has a grayish color."},
-      {q: "Should I rest meat after cooking?", a: "Always. Resting allows muscle fibers to reabsorb juices that were pushed to the center during cooking. 5 minutes for a steak, 20–30 minutes for a roast."},
-      {q: "What does 'grass-fed' and 'grain-finished' mean for flavor?", a: "Grass-fed beef tends to be leaner with a more mineral, complex flavor. Grain-finished cattle have more marbling and a sweeter, buttery flavor. Both can be exceptional."},
-      {q: "What's the best way to tenderize tough cuts quickly?", a: "Salt the meat 24–48 hours in advance (dry-brining), use a marinade with an acid element, or slice against the grain very thin. None replace low-slow cooking for collagen-rich cuts."},
-      {q: "How thick should a steak be?", a: "A minimum of 2.5cm (1 inch) for a pan-seared steak. Thinner steaks overcook before a proper crust develops. Ideal thickness is 3–4cm for a restaurant-quality result."}
+      {q: "How do I know if meat is fresh?", a: "Beef should be bright cherry-red, firm to touch, and have a clean, mild smell. Avoid meat that smells sour or has a grayish color."},
+      {q: "Should I rest meat after cooking?", a: "Always. Resting allows muscle fibers to reabsorb juices. 5 minutes for a steak, 20–30 minutes for a roast."}
     ],
-    keyTakeaways: ["Working muscles (shoulder, leg) need slow, moist heat; non-working muscles (loin) need quick, dry heat", "Secondary cuts offer superior flavor and value compared to prime cuts", "Resting meat after cooking is non-negotiable for juicy results", "Grass-fed and grain-finished beef have distinct flavor profiles — both can be excellent", "Learning secondary cuts will make you a significantly more adventurous and economical cook"],
-    conclusion: "Your relationship with meat improves dramatically once you understand the anatomy of the animal and the logic of each cut. Stop paying premium prices for fillet when an onglet or a properly braised chuck will deliver more flavor for far less money. Befriend your local butcher — they are an invaluable resource who can source unusual cuts, advise on preparation, and share knowledge that no cookbook can fully convey. Let curiosity guide your next purchase."
+    keyTakeaways: ["Working muscles need slow, moist heat; non-working muscles need quick, dry heat", "Secondary cuts offer superior flavor and value", "Resting meat after cooking is non-negotiable for juicy results"],
+    conclusion: "Your relationship with meat improves dramatically once you understand the anatomy of the animal and the logic of each cut."
   },
   {
     title: "Spice Blending: Creating Your Own Signature Mixes",
@@ -1729,32 +1846,14 @@ const blogs = [
     date: "Jan 10, 2026",
     readTime: 7,
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Pre-made spice blends are convenient but pale in comparison to freshly made mixes tailored to your taste. Learn the principles of blending and create signature mixes that define your cooking style.",
-    content: `
-      <p>Every great cuisine has its signature spice blends — the combinations of aromatics that give food its cultural identity. Indian garam masala, Moroccan ras el hanout, Ethiopian berbere, Chinese five spice, Middle Eastern za'atar — these are not random collections but carefully evolved formulas that balance heat, fragrance, earthiness, and sweetness in ways that transcend individual ingredients.</p>
-      <img src="https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=800&auto=format&fit=crop&q=80" alt="Vibrant array of colorful ground spices in bowls">
-      <h2>The Principles of Spice Blending</h2>
-      <p>Every successful spice blend has structure. Think in terms of roles: base notes (warm, earthy spices that anchor the blend), middle notes (aromatic spices that provide character), and top notes (bright, volatile spices that add lift). A good blend needs all three. Cumin and coriander are classic base notes. Cardamom and cinnamon are middle notes. Black pepper and chili provide the top note heat and brightness.</p>
-      <p>Balance is equally important. Heat should complement rather than overwhelm. Sweetness (from cinnamon, allspice, or dried fruit) softens bitter and harsh notes. Acid-bright spices like sumac or dried mango powder (amchur) cut through fatty ingredients. Salt and sugar are not typically part of dry spice blends — they're added separately during cooking.</p>
-      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&auto=format&fit=crop&q=80" alt="Wooden spoons filled with different ground spice blends">
-      <h2>Classic Blends to Master First</h2>
-      <p>Garam masala is a good starting point: toast and grind together cumin, coriander, cardamom, black pepper, cinnamon, cloves, and nutmeg. Every family in India has a slightly different version, and creating yours is the beginning of developing a personal style. It should smell warm, fragrant, and complex — not overwhelmingly hot.</p>
-      <p>Za'atar — a Middle Eastern blend of dried thyme, sumac, sesame seeds, and salt — is possibly the simplest and most versatile blend to make. It works on bread dipped in olive oil, on roasted vegetables, on labneh, on eggs. Once you discover it, you'll use it constantly. Ras el hanout, by contrast, is one of the most complex blends: some versions contain 30+ spices including rose petals, mace, and galangal alongside the more familiar cumin and ginger.</p>
-      <img src="https://images.unsplash.com/photo-1458642849426-cfb724f15ef7?w=800&auto=format&fit=crop&q=80" alt="Mortar and pestle grinding whole spices">
-      <h2>The Importance of Freshness and Toasting</h2>
-      <p>Whole spices retain their volatile aromatic compounds far longer than ground spices. When you grind your own blends from whole spices you've toasted minutes before, the difference in intensity and freshness is staggering. Toast spices in a dry pan over medium heat just until fragrant — 30–90 seconds. Allow to cool completely before grinding in a dedicated spice grinder (a cheap blade coffee grinder works perfectly).</p>
-      <img src="https://images.unsplash.com/photo-1473973266408-ed4e27abdd47?w=800&auto=format&fit=crop&q=80" alt="Whole spices — cinnamon sticks, star anise, cardamom, cloves — ready to toast">
-      <p>Store your custom blends in small, airtight glass jars away from heat and light. Label with the date. Most blends will be at peak quality for 3–6 months, though they'll still be usable longer. Make small batches regularly rather than large batches infrequently.</p>
-    `,
+    excerpt: "Pre-made spice blends pale in comparison to freshly made mixes. Learn the principles of blending and create signature mixes that define your cooking style.",
+    content: `<p>Every great cuisine has its signature spice blends — the combinations of aromatics that give food its cultural identity. Indian garam masala, Moroccan ras el hanout, Ethiopian berbere — these are carefully evolved formulas that balance heat, fragrance, earthiness, and sweetness.</p><h2>The Principles of Spice Blending</h2><p>Every successful spice blend has structure. Think in terms of roles: base notes (warm, earthy spices), middle notes (aromatic spices), and top notes (bright, volatile spices that add lift).</p>`,
     faqs: [
-      {q: "Do I need a spice grinder?", a: "A dedicated spice grinder (or blade coffee grinder used only for spices) is enormously helpful. A mortar and pestle works too but takes more effort for large quantities."},
-      {q: "What's the shelf life of homemade spice blends?", a: "3–6 months for peak flavor when stored in airtight containers away from heat and light. After that, they lose potency gradually but remain safe to use."},
-      {q: "Can I substitute one spice for another in a blend?", a: "Generally yes, with care. Within the same family (e.g., different chili varieties), substitution is easy. Across families, you need to understand what role each spice plays."},
-      {q: "Is it necessary to toast spices before blending?", a: "For whole spices, yes — toasting dramatically intensifies flavor by activating volatile compounds. Skip this step and your blend will taste flat by comparison."},
-      {q: "How do I know when I've nailed a blend?", a: "Smell it. A good blend should smell complex, balanced, and aromatic — no single note should overpower. Then taste a tiny pinch. If it's warm, balanced, and makes you want to cook immediately, you've succeeded."}
+      {q: "Do I need a spice grinder?", a: "A dedicated spice grinder is enormously helpful. A mortar and pestle works too but takes more effort for large quantities."},
+      {q: "Is it necessary to toast spices before blending?", a: "For whole spices, yes — toasting dramatically intensifies flavor by activating volatile compounds."}
     ],
-    keyTakeaways: ["Every blend needs base, middle, and top notes for complexity and balance", "Toasting whole spices before grinding dramatically increases flavor intensity", "Start with classic blends (garam masala, za'atar) before developing signature mixes", "Store blends in airtight glass containers away from heat and light", "Make small, fresh batches regularly rather than large batches that lose potency"],
-    conclusion: "The moment you make your first custom spice blend from freshly toasted, freshly ground whole spices, the pre-made jar on your supermarket shelf will feel like a different product entirely. Custom blending lets you adjust heat, balance aromatics to your taste, and create a signature flavor profile that's entirely yours. This is one of the most direct ways to bring genuine creativity to your cooking — it costs almost nothing and makes an enormous difference."
+    keyTakeaways: ["Every blend needs base, middle, and top notes for complexity", "Toasting whole spices before grinding dramatically increases flavor intensity", "Store blends in airtight glass containers away from heat and light"],
+    conclusion: "The moment you make your first custom spice blend from freshly toasted, freshly ground whole spices, the pre-made jar on your supermarket shelf will feel like a different product entirely."
   },
   {
     title: "The Art of Plating: Restaurant Presentation at Home",
@@ -1762,268 +1861,134 @@ const blogs = [
     date: "Jan 3, 2026",
     readTime: 7,
     image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Stunning presentation doesn't require chef training or expensive tools. Master the fundamental principles of plating and transform everyday dishes into visually striking meals.",
-    content: `
-      <p>We eat with our eyes first. Before a single molecule of flavor reaches our taste receptors, our brain has already formed an opinion based on visual cues: color, composition, height, texture, and cleanliness. A beautifully plated dish creates positive anticipation that actually enhances the perception of flavor — this is not marketing speak but documented sensory psychology.</p>
-      <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&auto=format&fit=crop&q=80" alt="Restaurant plating">
-      <h2>The White Plate Rule</h2>
-      <p>Professional chefs overwhelmingly prefer white plates, and for good reason. White creates a neutral, clean canvas that makes food colors pop. The warm tones of a roasted chicken against pristine white create a visual warmth. The vibrant green of herb oil becomes electrifying. Patterned or colored plates compete with the food — white plates always let the food win.</p>
-      <p>Invest in a few pieces of quality white porcelain in different sizes and shapes: a dinner plate, a shallow bowl, and a large flat platter cover most needs. Simple, clean, slightly weighty white ceramics are not expensive and will serve you for decades.</p>
-      <h2>The Rule of Thirds and Negative Space</h2>
-      <p>Rather than centering food on a plate (the instinct of most home cooks), think in thirds. Imagine the plate divided into a 3×3 grid and place your main element at one of the intersection points. This creates visual dynamism and — crucially — leaves generous negative space (empty plate area) that gives the eye room to rest and prevents the plate from looking cluttered.</p>
-      <p>Negative space is not wasted space. It signals confidence and restraint — the qualities that distinguish restaurant plating from home cooking. Resist the urge to fill every inch of the plate. Less, done beautifully, is always more compelling than more, done carelessly.</p>
-      <img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&auto=format&fit=crop&q=80" alt="Fine dining">
-      <h2>Height, Texture, and Color</h2>
-      <p>A flat plate is a boring plate. Build height — stack elements, lean things against each other, pile a dressed salad. Even a 3cm height difference creates visual interest and a sense of abundance. Add contrasting textures: the crunch of toasted nuts against a creamy purée, crispy skin against tender flesh, a fresh herb against a glossy sauce.</p>
-      <p>Color is your most powerful tool. Aim for at least three distinct colors on each plate. A protein and a sauce need a fresh counterpoint — a bright green purée, vivid micro herbs, a scattering of pomegranate seeds, a squeeze of lemon. The goal is not a rainbow but deliberate contrast that creates visual energy.</p>
-    `,
+    excerpt: "Stunning presentation doesn't require chef training. Master the fundamental principles of plating and transform everyday dishes into visually striking meals.",
+    content: `<p>We eat with our eyes first. Before a single molecule of flavor reaches our taste receptors, our brain has already formed an opinion based on visual cues: color, composition, height, texture, and cleanliness.</p><h2>The White Plate Rule</h2><p>Professional chefs overwhelmingly prefer white plates. White creates a neutral, clean canvas that makes food colors pop. Invest in a few pieces of quality white porcelain in different sizes and shapes.</p>`,
     faqs: [
-      {q: "Do I need expensive plating tools?", a: "No. A squeeze bottle (for sauces and oils), small spoons, tweezers (for delicate garnishes), and a ring mold cover 90% of plating techniques."},
-      {q: "How do I keep food warm while plating?", a: "Warm your plates in a low oven (70°C) for 10 minutes. Work quickly. Have all components ready before starting to plate."},
-      {q: "What are the easiest garnishes for home cooks?", a: "Fresh herbs (whole leaves or chiffonade), edible flowers (available at specialty stores), citrus zest, toasted nuts or seeds, and a drizzle of good quality oil or vinegar."},
-      {q: "How do I get clean, precise sauce dots or swooshes?", a: "Use a squeeze bottle for dots and a large spoon for swooshes. For a swoosh, drop sauce at 10 o'clock on the plate and drag the back of the spoon through it in a curved motion."},
-      {q: "Is it worth bothering with presentation for everyday meals?", a: "Even small improvements — a sprig of herb, wiping the plate rim, a drizzle of oil — make food more pleasurable to eat. It takes 30 seconds and signals care and effort."}
+      {q: "Do I need expensive plating tools?", a: "No. A squeeze bottle, small spoons, tweezers, and a ring mold cover 90% of plating techniques."},
+      {q: "What are the easiest garnishes for home cooks?", a: "Fresh herbs, edible flowers, citrus zest, toasted nuts or seeds, and a drizzle of good quality oil or vinegar."}
     ],
-    keyTakeaways: ["White plates are the most versatile and professional-looking choice", "Use the rule of thirds rather than centering food — leave generous negative space", "Build height and incorporate contrasting textures for visual interest", "Aim for at least three distinct colors on every plate", "Work quickly and warm your plates to keep food at the right temperature"],
-    conclusion: "Beautiful presentation is not about pretension — it's about respect: respect for the food you've prepared, for the people you're serving, and for the ritual of sharing a meal. You don't need to create Michelin-star plates at home, but developing a thoughtful eye for composition and color will make every meal a more pleasurable experience. Start with one principle at a time, and your plating will improve more quickly than you expect."
+    keyTakeaways: ["White plates are the most versatile and professional-looking choice", "Use the rule of thirds — leave generous negative space", "Build height and incorporate contrasting textures for visual interest"],
+    conclusion: "Beautiful presentation is about respect — for the food you've prepared, for the people you're serving, and for the ritual of sharing a meal."
   },
   {
     title: "Coffee Beyond the Cup: Cooking with Coffee",
     category: "Ingredients",
-    date: "Dec 27, 2026",
+    date: "Dec 27, 2025",
     readTime: 8,
     image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Coffee's complex flavor profile — bitter, sweet, earthy, and acidic — makes it a remarkably versatile cooking ingredient that can transform meat, chocolate desserts, spice rubs, and more.",
-    content: `
-      <p>Most of us think of coffee exclusively as a beverage, but professional chefs have long understood that coffee's complex, multi-layered flavor profile makes it an extraordinary cooking ingredient. Its bitter, earthy qualities can amplify umami in savory dishes. Its acidity can brighten and balance rich flavors. And its roasted notes create fascinating depth in chocolate desserts that no other ingredient quite replicates.</p>
-      <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&auto=format&fit=crop&q=80" alt="Coffee">
-      <h2>Coffee in Savory Cooking</h2>
-      <p>Coffee's most surprising application is in meat cooking. A coffee-based dry rub — ground coffee combined with smoked paprika, cumin, brown sugar, salt, and black pepper — creates an extraordinary crust on beef brisket, pork shoulder, or lamb. The coffee doesn't make the meat taste like coffee; it darkens and intensifies the crust, adding a complexity that elevates the entire dish.</p>
-      <p>Brewed coffee or espresso also works as a braising liquid or sauce element. Add a shot of espresso to a beef stew 30 minutes before the end of cooking — it adds depth without a recognizable coffee flavor. Coffee-braised short ribs, where the meat slow-cooks in a mixture of coffee, red wine, and aromatics, is an extraordinary dish of complex, dark intensity.</p>
-      <img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&auto=format&fit=crop&q=80" alt="Coffee dessert">
-      <h2>Coffee in Baking and Desserts</h2>
-      <p>Coffee and chocolate are natural partners — coffee amplifies and deepens chocolate flavor by suppressing bitterness and adding aromatic complexity. A tablespoon of instant espresso powder added to chocolate cake batter, brownie mixture, or chocolate frosting transforms good chocolate flavor into extraordinary. You can't taste the coffee, but you can absolutely taste the difference.</p>
-      <p>Beyond amplifying chocolate, coffee stars in its own right in classic desserts. Tiramisu, the Italian triumph of espresso-soaked savoiardi and mascarpone cream, is the most famous example. Coffee granita — frozen brewed coffee with sugar, topped with unsweetened whipped cream — is a Sicilian summer pleasure of elegant simplicity. Coffee ice cream, coffee crème brûlée, and coffee panna cotta all celebrate the ingredient in its full complexity.</p>
-    `,
+    excerpt: "Coffee's complex flavor profile makes it a remarkably versatile cooking ingredient that can transform meat, chocolate desserts, spice rubs, and more.",
+    content: `<p>Most of us think of coffee exclusively as a beverage, but professional chefs have long understood that coffee's complex flavor profile makes it an extraordinary cooking ingredient.</p><h2>Coffee in Savory Cooking</h2><p>Coffee's most surprising application is in meat cooking. A coffee-based dry rub — ground coffee combined with smoked paprika, cumin, brown sugar, salt, and black pepper — creates an extraordinary crust on beef brisket or pork shoulder.</p>`,
     faqs: [
-      {q: "Should I use fresh coffee or instant espresso powder for cooking?", a: "Instant espresso powder dissolves easily into batters and sauces and is ideal for most baking applications. Fresh brewed espresso is better for liquid applications like braises and syrups."},
-      {q: "Does cooking with coffee make food taste like coffee?", a: "Not necessarily. In small amounts, coffee acts as a flavor enhancer, deepening other flavors without announcing itself. Larger amounts give a distinct coffee character."},
-      {q: "What roast level is best for cooking?", a: "Dark roast for savory spice rubs and chocolate desserts (its bittersweet intensity works well). Medium roast for more delicate applications where nuance matters."},
-      {q: "Can I use decaffeinated coffee for cooking?", a: "Yes — decaf has the same flavor compounds without caffeine. The taste difference is minimal in most cooking applications."},
-      {q: "What other beverages work similarly to coffee in cooking?", a: "Strong tea (especially smoked teas like Lapsang Souchong) and chicory are interesting coffee alternatives. For desserts, concentrated black tea can substitute in tiramisu-inspired recipes."}
+      {q: "Should I use fresh coffee or instant espresso powder for cooking?", a: "Instant espresso powder dissolves easily into batters and sauces. Fresh brewed espresso is better for liquid applications like braises and syrups."},
+      {q: "Does cooking with coffee make food taste like coffee?", a: "Not necessarily. In small amounts, coffee acts as a flavor enhancer, deepening other flavors without announcing itself."}
     ],
-    keyTakeaways: ["Coffee rubs create extraordinary crusts on beef, pork, and lamb without a recognizable coffee flavor", "Adding espresso to chocolate desserts amplifies and deepens chocolate without making it taste like coffee", "Coffee as a braising liquid adds complex dark depth to meat dishes", "Dark roast works best for savory applications; medium roast for delicate baking", "Tiramisu is the greatest showcase of coffee's dessert potential — and worth mastering"],
-    conclusion: "Coffee is one of the most underused cooking ingredients in the home kitchen. Its complexity — bitter, sweet, earthy, acidic, aromatic — makes it a remarkably effective flavor enhancer that works across sweet and savory applications. The next time you're making a chocolate cake or slow-cooking a brisket, reach for your coffee. The results will surprise and delight you, and you'll quickly find new ways to bring this extraordinary ingredient into your regular cooking repertoire."
+    keyTakeaways: ["Coffee rubs create extraordinary crusts without a recognizable coffee flavor", "Adding espresso to chocolate desserts amplifies flavor without making it taste like coffee", "Dark roast works best for savory applications"],
+    conclusion: "Coffee is one of the most underused cooking ingredients in the home kitchen. The next time you're making a chocolate cake or slow-cooking a brisket, reach for your coffee."
   },
   {
     title: "Wine Pairing Principles Every Cook Should Know",
     category: "Culture",
-    date: "Dec 20, 2026",
+    date: "Dec 20, 2025",
     readTime: 8,
     image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Great wine pairing isn't about memorizing rules — it's about understanding flavor relationships. These principles will help you make confident, delicious pairings for any dish.",
-    content: `
-      <p>Wine pairing has an unfortunate reputation for being intimidating — an exclusive domain of sommeliers and connoisseurs who speak in impenetrable language. The truth is that successful wine pairing rests on a handful of logical flavor principles that anyone can learn and apply. And while expert sommeliers certainly achieve greater precision, any thoughtful cook can find pairings that genuinely enhance both the food and the wine.</p>
-      <img src="https://images.unsplash.com/photo-1474722883778-792e7990302f?w=800&auto=format&fit=crop&q=80" alt="Wine">
-      <h2>The Foundational Principle: Match Weight to Weight</h2>
-      <p>The most fundamental pairing principle is matching the weight and intensity of the wine to the weight and intensity of the food. Delicate, light dishes pair best with light, delicate wines. Rich, bold dishes need wine with structure, tannin, and weight to stand alongside them. A Muscadet, the lightest of white wines, is overwhelmed by a heavily sauced boeuf bourguignon; a full-bodied Barolo would crush a delicate sole meunière.</p>
-      <p>Think in these broad categories: light dishes (steamed fish, green salads, light pasta) pair with light wines (Pinot Grigio, Vinho Verde, lighter Chardonnay, light reds like Pinot Noir). Medium-weight dishes (roast chicken, creamy pasta, salmon) suit medium-weight wines (white Burgundy, rosé, Syrah/Shiraz). Rich, heavy dishes (red meat braises, lamb, aged cheeses) demand full-bodied, tannic reds (Cabernet Sauvignon, Barolo, Rioja Reserva).</p>
-      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&auto=format&fit=crop&q=80" alt="Wine and food">
-      <h2>Acidity, Tannin, and Sweetness</h2>
-      <p>Three wine characteristics are critical for pairing. Acidity in wine (white wines and lighter reds) cuts through richness and fat, refreshing the palate. A high-acid Riesling with fatty pork belly, or a crisp Vermentino with fried food, demonstrates this perfectly. Tannin in red wines binds with proteins and softens in the presence of fat — this is why tannic Cabernet Sauvignon pairs so magnificently with a fatty rib-eye steak but can taste unpleasantly bitter with fish.</p>
-      <p>Sweetness in wine must match or exceed sweetness in food — otherwise the wine tastes thin and acidic by comparison. This is why a bone-dry Champagne can taste thin with a very sweet dessert. A late-harvest Riesling, Sauternes, or fortified wine (Port, Sherry) are better choices for sweet finales. The classic "if in doubt, match sweetness" rule of dessert pairing rarely fails.</p>
-    `,
+    excerpt: "Great wine pairing isn't about memorizing rules — it's about understanding flavor relationships.",
+    content: `<p>Wine pairing has an unfortunate reputation for being intimidating. The truth is that successful wine pairing rests on a handful of logical flavor principles that anyone can learn and apply.</p><h2>The Foundational Principle: Match Weight to Weight</h2><p>The most fundamental pairing principle is matching the weight and intensity of the wine to the weight and intensity of the food. Delicate dishes pair best with light, delicate wines. Rich, bold dishes need wine with structure, tannin, and weight.</p>`,
     faqs: [
-      {q: "Does red wine always go with red meat and white wine with fish?", a: "It's a useful starting guideline but not a rule. A full-bodied rosé or light Pinot Noir can work beautifully with salmon. Light whites can suit lighter meat preparations. Flavor matters more than color."},
-      {q: "What wine do I serve with spicy food?", a: "Off-dry Riesling or Gewürztraminer are outstanding with spicy Asian and Indian dishes. Their residual sweetness tames heat. Avoid high-tannin reds, which amplify spice uncomfortably."},
-      {q: "Should I cook with the wine I'm drinking?", a: "Use a wine you'd be happy to drink — avoid 'cooking wines' with added salt. You don't need to use the same wine you're serving, but the quality should be comparable."},
-      {q: "What about regional pairing?", a: "The classic advice is 'drink what grows together, goes together.' Wines from a region evolved alongside the local cuisine and usually pair naturally. Italian wines with Italian food, Alsatian wines with Alsatian food."},
-      {q: "How do I pair wine with cheese?", a: "White wines generally pair better with cheese than reds. Champagne with triple-cream cheeses is transcendent. Sauternes with Roquefort is a classic. For bold reds, choose firm, aged cheeses like Parmigiano."}
+      {q: "Does red wine always go with red meat and white wine with fish?", a: "It's a useful starting guideline but not a rule. A full-bodied rosé or light Pinot Noir can work beautifully with salmon."},
+      {q: "What wine do I serve with spicy food?", a: "Off-dry Riesling or Gewürztraminer are outstanding with spicy Asian and Indian dishes."}
     ],
-    keyTakeaways: ["Match the weight and intensity of wine to the weight of the dish", "Acidity in wine cuts through fat and richness — use it deliberately", "Tannins soften in the presence of protein and fat; avoid tannic reds with delicate or fatty fish", "Sweet desserts need sweet wines — or the wine will taste thin and acidic", "Regional pairings ('what grows together goes together') are reliable and culturally enriching"],
-    conclusion: "Wine pairing is not about following rules — it's about understanding why certain combinations work and applying those principles with confidence. Once you understand the relationship between acidity and fat, tannin and protein, and the importance of matching intensities, you'll find that many pairings become intuitive. And the best part: experimentation is delicious. Every 'mistake' is also a learning experience worth savoring."
+    keyTakeaways: ["Match the weight and intensity of wine to the weight of the dish", "Acidity in wine cuts through fat and richness", "Sweet desserts need sweet wines"],
+    conclusion: "Wine pairing is not about following rules — it's about understanding why certain combinations work and applying those principles with confidence."
   },
   {
     title: "Zero-Waste Cooking: Delicious Dishes from Scraps",
     category: "Tips & Tricks",
-    date: "Dec 13, 2026",
+    date: "Dec 13, 2025",
     readTime: 9,
     image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=900&auto=format&fit=crop&q=80",
-    excerpt: "One-third of all food produced globally is wasted. Learn how to transform kitchen scraps into extraordinary dishes, reduce your waste, and stretch your grocery budget further.",
-    content: `
-      <p>The average household throws away an extraordinary amount of food every week — vegetable peelings, herb stems, bread ends, meat bones, fruit skins, wilting produce. Yet to a creative cook, this 'waste' is an inventory of ingredients waiting to be transformed. The zero-waste cooking philosophy isn't about deprivation or compromise; it's about creativity, resourcefulness, and a deeper respect for the ingredients that feed us.</p>
-      <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80" alt="Zero waste cooking">
-      <h2>Building Stock from Scraps</h2>
-      <p>The most powerful zero-waste technique is stock making. Keep a dedicated bag in your freezer for vegetable scraps: onion skins and roots, carrot tops and peelings, celery leaves and bottoms, mushroom stems, herb stems, leek trimmings. When the bag is full, simmer everything in water for an hour, strain, and you have a deeply flavorful stock that would cost several dollars at a supermarket.</p>
-      <p>Similarly, save chicken carcasses after a roast dinner, or raw chicken bones from breaking down a whole bird. Roast the bones until golden, then cover with cold water, add your vegetable scraps, and simmer for 3–4 hours. The resulting chicken stock will be extraordinary — gelatinous, golden, deeply savory — and it cost you nothing except a few hours of your time.</p>
-      <img src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=800&auto=format&fit=crop&q=80" alt="Kitchen scraps">
-      <h2>Bread and Its Second Lives</h2>
-      <p>Stale bread is one of the most valuable kitchen 'wastes.' Torn into chunks and oven-dried, it becomes panzanella (Tuscan bread salad), ribollita (Tuscan bread soup), or bread pudding. Blitzed to crumbs in a food processor, it transforms into breadcrumbs for coating, binding meatballs, or the topping of a pasta gratin. Thick slices of stale bread pan-fried in butter with garlic become crostini that can support any topping. A loaf past its prime should be seen as an opportunity, not a disposal problem.</p>
-      <p>Parmesan rinds have already been mentioned, but their value deserves emphasis. Collect them in the freezer alongside other cheese rinds — even Comté or Gruyère rinds add flavor to soups. A rind of Parmesan simmering in minestrone transforms a good soup into a great one.</p>
-      <h2>Citrus Peels and Herb Stems</h2>
-      <p>Citrus peels — lemon, orange, lime — are treasure troves of aromatic essential oils concentrated in the zest. Dry them in a low oven, then use in spice blends, infused teas, or candied for confectionery. Simmer orange peel in simple syrup for a beautiful cocktail addition. Lemon peel, blanched three times to remove bitterness, can be preserved in sugar or salt. Nothing of a citrus fruit needs to be wasted.</p>
-      <p>Herb stems (the parts we typically discard) are almost as flavorful as the leaves. Parsley stems are excellent in stock. Coriander stems are actually more flavorful than the leaves in Thai curry pastes and should be used freely. Basil stems infuse beautifully into oil. Thyme and rosemary stems add flavor to grilled meats. The leaves are valuable; the stems are not waste.</p>
-    `,
+    excerpt: "Learn how to transform kitchen scraps into extraordinary dishes, reduce your waste, and stretch your grocery budget further.",
+    content: `<p>The average household throws away an extraordinary amount of food every week. Yet to a creative cook, this 'waste' is an inventory of ingredients waiting to be transformed.</p><h2>Building Stock from Scraps</h2><p>The most powerful zero-waste technique is stock making. Keep a dedicated bag in your freezer for vegetable scraps: onion skins, carrot tops, celery leaves, mushroom stems, herb stems. When the bag is full, simmer everything in water for an hour, strain, and you have a deeply flavorful stock.</p>`,
     faqs: [
-      {q: "Which vegetable scraps should I avoid putting in stock?", a: "Avoid cruciferous vegetables (broccoli, cabbage) which make stock bitter. Starchy vegetables like potatoes make stock cloudy. Strong-flavored veg like beets or fennel can overwhelm."},
-      {q: "How long can I store vegetable scrap stock?", a: "4–5 days refrigerated, or freeze for up to 6 months. Freeze in ice cube trays for convenient portions."},
-      {q: "What's the best way to revive wilting herbs?", a: "Trim the stems and stand in cold water for 30–60 minutes. Most herbs (except basil) can also be wrapped in damp paper towel and refrigerated."},
-      {q: "Can I use meat bones more than once?", a: "Yes, though successive batches have less flavor. The second stock (called remouillage) is lighter and best used for braising liquid rather than a standalone soup base."},
-      {q: "How do I deal with overripe fruit before it goes bad?", a: "Overripe fruit is perfect for baking (bananas for bread, berries for crumble), smoothies, jam, or oven-roasting with honey and spices as a dessert or breakfast topping."}
+      {q: "Which vegetable scraps should I avoid putting in stock?", a: "Avoid cruciferous vegetables (broccoli, cabbage) which make stock bitter. Starchy vegetables like potatoes make stock cloudy."},
+      {q: "How do I deal with overripe fruit before it goes bad?", a: "Overripe fruit is perfect for baking, smoothies, jam, or oven-roasting with honey and spices."}
     ],
-    keyTakeaways: ["Vegetable and meat scraps make extraordinary, free stock when saved and simmered", "Stale bread has many delicious second lives — from breadcrumbs to panzanella to bread pudding", "Citrus peels, herb stems, and cheese rinds are valuable flavor ingredients, not waste", "A freezer scrap bag is the most enabling zero-waste tool in the kitchen", "Zero-waste cooking develops creativity, saves money, and reduces environmental impact"],
-    conclusion: "Zero-waste cooking is, at its heart, a mindset shift. When you stop seeing scraps as disposal problems and start seeing them as ingredients waiting for purpose, your cooking deepens and your relationship with food becomes more thoughtful and respectful. The environmental benefits are real and significant, but so is the creative reward of turning a pile of kitchen scraps into a magnificent stock, a ribollita, or a dessert that surprises even you."
+    keyTakeaways: ["Vegetable and meat scraps make extraordinary, free stock when saved and simmered", "Stale bread has many delicious second lives", "A freezer scrap bag is the most enabling zero-waste tool"],
+    conclusion: "Zero-waste cooking is, at its heart, a mindset shift. When you stop seeing scraps as disposal problems and start seeing them as ingredients waiting for purpose, your cooking deepens."
   },
   {
     title: "The History and Science of Barbecue",
     category: "Culture",
-    date: "Dec 6, 2026",
+    date: "Dec 6, 2025",
     readTime: 11,
     image: "https://images.unsplash.com/photo-1558030006-450675393462?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Barbecue is one of humanity's oldest cooking methods and one of its most culturally significant. Explore its rich history, the science of smoke, and the regional traditions that define it.",
-    content: `
-      <p>Of all the cooking methods humans have developed, few stir as much passion, regional pride, and philosophical debate as barbecue. At its most elemental, barbecue is simply meat cooked low and slow over indirect heat and smoke. Yet within this simple framework exists extraordinary diversity — the result of centuries of cultural evolution, regional ingredient traditions, and deeply personal conviction about what constitutes the proper way to cook.</p>
-      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80" alt="Barbecue">
-      <h2>The Origins of Barbecue</h2>
-      <p>The word "barbecue" likely derives from the Taino word "barabicoa," used by the indigenous people of the Caribbean to describe wooden frameworks over which meat was dried and smoked. Spanish explorers encountered this technique in the 16th century and brought it to the mainland Americas, where it evolved into the diverse barbecue traditions we know today.</p>
-      <p>In the American South, barbecue developed along different regional lines, each influenced by the local economy, agriculture, and culture. Texas barbecue — defined by post oak-smoked beef brisket, developed around the German and Czech immigrant communities who were cattle ranchers. Carolina barbecue centers on pork, particularly whole hog in Eastern North Carolina and shoulder in the Piedmont, each region with its own vinegar or tomato-based sauce traditions. Kansas City barbecue applies its sweet, thick tomato-based sauce to virtually everything.</p>
-      <img src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&auto=format&fit=crop&q=80" alt="BBQ meat">
-      <h2>The Science of Low and Slow</h2>
-      <p>Why does low-and-slow cooking transform tough, collagen-rich cuts into tender, pull-apart magnificence? At cooking temperatures between 107–135°C (225–275°F), two critical things happen over many hours. First, the collagen in connective tissue (abundant in shoulders, ribs, and brisket) converts to gelatin — a process requiring time and heat. This gelatin makes the meat unctuous, slippery, and deeply satisfying.</p>
-      <p>Second, smoke penetrates the meat during this extended cook, depositing compounds called phenols and carbonyls that create the complex, woody, slightly bitter "smoke ring" and flavor. The famous pink smoke ring just beneath the surface of great barbecue is caused by nitric oxide from the smoke reacting with myoglobin in the meat — it's a purely visual phenomenon but one treated with reverence by barbecue devotees as proof of proper smoke penetration.</p>
-    `,
+    excerpt: "Barbecue is one of humanity's oldest cooking methods and one of its most culturally significant. Explore its rich history, the science of smoke, and regional traditions.",
+    content: `<p>Of all the cooking methods humans have developed, few stir as much passion, regional pride, and philosophical debate as barbecue. At its most elemental, barbecue is simply meat cooked low and slow over indirect heat and smoke.</p><h2>The Origins of Barbecue</h2><p>The word "barbecue" likely derives from the Taino word "barabicoa," used by the indigenous people of the Caribbean to describe wooden frameworks over which meat was dried and smoked.</p>`,
     faqs: [
-      {q: "What's the difference between barbecue and grilling?", a: "Grilling is quick, high-heat cooking over direct heat. Barbecue is slow, low-heat cooking over indirect heat with smoke. They are fundamentally different cooking methods, though the terms are often confused."},
-      {q: "What wood should I use for smoking?", a: "Match the wood to the protein: oak and hickory for beef, fruit woods (apple, cherry) for pork and poultry, alder for fish. Avoid resinous woods like pine — they produce bitter, acrid smoke."},
-      {q: "What is 'the stall' in barbecue?", a: "The stall is when brisket or pork stops rising in temperature (often around 74°C) for hours. This happens because evaporative cooling balances the heat. It's normal — be patient or wrap the meat in butcher paper to push through."},
-      {q: "Is a smoker necessary for home barbecue?", a: "No. A kettle grill set up for indirect cooking with wood chips can produce excellent smoked results. A dedicated offset smoker gives more control but isn't essential to start."},
-      {q: "What's the importance of the bark in barbecue?", a: "The bark — the dark, crunchy, intensely flavorful exterior crust — is often called the best part of smoked brisket or pork. It forms through the caramelization of the rub and the binding of smoke compounds to the meat surface."}
+      {q: "What's the difference between barbecue and grilling?", a: "Grilling is quick, high-heat cooking over direct heat. Barbecue is slow, low-heat cooking over indirect heat with smoke."},
+      {q: "What wood should I use for smoking?", a: "Match the wood to the protein: oak and hickory for beef, fruit woods (apple, cherry) for pork and poultry."}
     ],
-    keyTakeaways: ["Barbecue is low-and-slow cooking over indirect heat and smoke — distinct from grilling", "Regional American barbecue traditions reflect local agriculture, immigration, and culture", "Low and slow cooking converts collagen to gelatin, creating tender, unctuous meat", "Wood selection dramatically influences flavor — match wood to protein", "The bark (crust) and smoke ring are marks of proper barbecue technique and deeply prized"],
-    conclusion: "Barbecue is more than a cooking technique — it's a cultural ritual that speaks to community, patience, and craft. Whether you're slow-smoking a brisket over post oak in Texas, cooking a whole hog over coals in North Carolina, or attempting your first rack of ribs on a backyard kettle grill, you're participating in one of humanity's oldest and most joyful culinary traditions. Start simple, be patient, and let the smoke work its magic."
+    keyTakeaways: ["Barbecue is low-and-slow cooking over indirect heat and smoke — distinct from grilling", "Low and slow cooking converts collagen to gelatin, creating tender, unctuous meat", "Wood selection dramatically influences flavor"],
+    conclusion: "Barbecue is more than a cooking technique — it's a cultural ritual that speaks to community, patience, and craft."
   },
   {
     title: "Ice Cream Making: From Simple Custards to Creative Flavors",
     category: "Techniques",
-    date: "Nov 29, 2026",
+    date: "Nov 29, 2025",
     readTime: 8,
     image: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Homemade ice cream surpasses anything from the supermarket, and it's simpler than you think. Master the custard base and you can create any flavor your imagination suggests.",
-    content: `
-      <p>The moment you taste homemade ice cream made from a proper custard base — using real cream, genuine egg yolks, and quality flavorings — the difference from commercial ice cream becomes immediately and unmistakably clear. Homemade ice cream is richer, more intensely flavored, and has a texture that commercial products, with their stabilizers and emulsifiers, struggle to replicate. And while an ice cream machine certainly helps, it's not strictly necessary to make extraordinary ice cream at home.</p>
-      <img src="https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=800&auto=format&fit=crop&q=80" alt="Ice cream">
-      <h2>The Custard Base: Your Foundation</h2>
-      <p>Classic ice cream begins with a crème anglaise — a cooked custard of egg yolks, sugar, and cream. The ratio varies by richness desired, but a standard recipe uses 6 egg yolks, 150g sugar, 500ml full-fat cream, and 250ml whole milk. Heat the cream and milk together until steaming. Meanwhile, whisk yolks and sugar until pale. Temper the hot cream into the yolk mixture gradually, then return to the pan and cook over medium-low heat, stirring constantly, until it reaches 82°C (180°F) and coats a spoon.</p>
-      <p>The science: heating to 82°C denatures the egg proteins just enough to thicken the custard, while the sugar disrupts ice crystal formation, keeping the finished ice cream scoopable. Cooking too high curdles the eggs; too low leaves the custard thin and icy. This is why a thermometer is invaluable for ice cream making.</p>
-      <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&auto=format&fit=crop&q=80" alt="Homemade ice cream">
-      <h2>Flavoring Your Base</h2>
-      <p>With the custard base mastered, the possibilities are limitless. Vanilla ice cream — made with real vanilla beans steeped in the warm cream — is the benchmark. Add the scraped seeds and the whole pod for maximum flavor. Strain before churning. The resulting ice cream has a vanilla depth and complexity that no extract can achieve.</p>
-      <p>For chocolate ice cream, melt high-quality chocolate (70% cacao minimum) into the hot custard. Coffee ice cream steeps espresso beans or instant espresso in the warm cream. Caramel ice cream — perhaps the most seductive — starts with a dry caramel cooked to a deep amber, then enriched with cream and salt before making the custard. The possibilities for creative flavor development are truly endless.</p>
-    `,
+    excerpt: "Homemade ice cream surpasses anything from the supermarket. Master the custard base and you can create any flavor your imagination suggests.",
+    content: `<p>The moment you taste homemade ice cream made from a proper custard base — using real cream, genuine egg yolks, and quality flavorings — the difference from commercial ice cream becomes immediately and unmistakably clear.</p><h2>The Custard Base: Your Foundation</h2><p>Classic ice cream begins with a crème anglaise — a cooked custard of egg yolks, sugar, and cream. Heat the cream and milk together until steaming. Whisk yolks and sugar until pale, then temper the hot cream into the yolk mixture gradually.</p>`,
     faqs: [
-      {q: "Do I need an ice cream machine?", a: "No. The no-churn method (whipped cream folded with condensed milk and flavorings) works reasonably well, though texture won't be as smooth as machine-churned. Stir-freeze method (churning by hand every 30 minutes) also works."},
-      {q: "Why is my ice cream rock hard from the freezer?", a: "Over-freezing or insufficient fat/sugar. Add a tablespoon of alcohol (vodka or rum) to lower the freezing point, or ensure your fat content is adequate. Remove from freezer 5–10 minutes before serving."},
-      {q: "Why does my custard sometimes curdle?", a: "Temperature went too high. Use a thermometer, stir constantly, and cook over medium-low heat. If it begins to curdle, remove from heat immediately and strain into a cold bowl."},
-      {q: "Can I make ice cream without eggs?", a: "Yes. Egg-free or 'Philadelphia style' ice cream uses cream, milk, and sugar without cooking. It's lighter and icier, without the richness of custard-based ice cream."},
-      {q: "How long does homemade ice cream keep?", a: "2–3 weeks in an airtight container. Press plastic wrap directly on the surface to prevent ice crystals forming. Quality is best in the first week."}
+      {q: "Do I need an ice cream machine?", a: "No. The no-churn method (whipped cream folded with condensed milk and flavorings) works reasonably well, though texture won't be as smooth."},
+      {q: "Why is my ice cream rock hard from the freezer?", a: "Over-freezing or insufficient fat/sugar. Remove from freezer 5–10 minutes before serving."}
     ],
-    keyTakeaways: ["Crème anglaise (cooked egg custard) forms the rich, scoopable base of premium ice cream", "Temperature control is critical: aim for 82°C to set the custard without scrambling eggs", "Real vanilla beans, high-quality chocolate, and freshly brewed espresso dramatically outperform extracts", "Sugar and fat are structural — they control ice crystal size and scoopability", "An ice cream machine gives better texture, but no-churn methods are a viable alternative"],
-    conclusion: "Making ice cream at home is one of those kitchen skills that delivers disproportionate reward relative to its complexity. Once you have the custard technique down, you can create any flavor you can imagine — far beyond what any supermarket offers. It also makes an extraordinary gift, demonstrating a level of care and craft that no store-bought pint can match. Make a batch this weekend, and you'll immediately understand why it's worth the effort."
+    keyTakeaways: ["Crème anglaise forms the rich, scoopable base of premium ice cream", "Temperature control is critical: aim for 82°C to set the custard without scrambling eggs", "Sugar and fat are structural — they control ice crystal size and scoopability"],
+    conclusion: "Making ice cream at home is one of those kitchen skills that delivers disproportionate reward relative to its complexity."
   },
   {
     title: "The Global History of Bread: From Flatbreads to Sourdough",
     category: "Culture",
-    date: "Nov 22, 2026",
+    date: "Nov 22, 2025",
     readTime: 10,
     image: "https://images.unsplash.com/photo-1549931319-a545dcf3bc7c?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Bread is the most universal food in human history — present in virtually every culture and civilization. Trace its extraordinary journey from ancient flatbreads to the sourdough renaissance.",
-    content: `
-      <p>Bread has been with us for approximately 14,000 years — long before the dawn of agriculture, ancient hunter-gatherers were grinding wild grains, mixing the flour with water, and cooking the resulting paste on hot stones. These primitive flatbreads were among the first processed foods that humans ever created, and their invention was a turning point in the story of our species. Food that could be stored, transported, and traded transformed everything.</p>
-      <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop&q=80" alt="Rustic artisan bread loaves on a wooden board">
-      <h2>The Discovery of Leavening</h2>
-      <p>The discovery that bread could rise — that wild yeasts in the air, captured by a mixture of flour and water, would create gases that lifted the dough into something light and airy — was one of the most consequential accidents in culinary history. Ancient Egyptian bakers, working around 4000 BCE, developed techniques for harnessing fermentation, and the leavened bread they produced was so valued that it served as currency, used to pay workers constructing the great pyramids.</p>
-      <p>The Egyptians also discovered that baking bread in enclosed ovens (rather than on open stones) created a superior product — crusted on the outside, soft within. They experimented with different grain varieties, fermentation times, and baking temperatures with a sophistication that would not be surpassed for millennia. In many ways, the ancient Egyptian baker would recognize the processes of a modern artisan bakery.</p>
-      <img src="https://images.unsplash.com/photo-1585478259715-876acc5be8eb?w=800&auto=format&fit=crop&q=80" alt="Sourdough starter bubbling in a glass jar — wild fermentation">
-      <h2>The Great Bread Traditions of the World</h2>
-      <p>Every civilization that adopted grain cultivation developed its own bread tradition, and these traditions reflect local grains, climates, cultural values, and cooking technologies. In West and Central Asia, flatbreads dominate: Persian lavash and sangak, Indian chapati, naan, and roti, Middle Eastern pita — all examples of thin, quick-cooking breads that predate ovens or need only a hot stone or griddle.</p>
-      <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&auto=format&fit=crop&q=80" alt="Fresh-baked pita and flatbreads stacked on a cloth">
-      <p>In Northern and Eastern Europe, where wheat struggled in harsh climates, rye became the primary bread grain. German pumpernickel — dense, dark, incredibly long-lasting — emerged from this tradition. Scandinavian knäckebröd (crispbread) was designed to be baked twice a year and stored through winter. In Ethiopia, teff-based injera has served as both bread and utensil for thousands of years. In Mexico, maize tortillas predate European contact by millennia.</p>
-      <h2>The Industrial Revolution and the Sourdough Renaissance</h2>
-      <p>The 19th-century Industrial Revolution transformed bread in ways both positive and negative. Commercial yeasts standardized and accelerated production, making bread cheaper and more accessible. The 20th century brought the Chorleywood Process (1961) — a method of ultra-fast bread production using additives and intense mechanical mixing — which now accounts for 80% of UK bread production but produces a product many bakers consider nutritionally and texturally inferior.</p>
-      <img src="https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=800&auto=format&fit=crop&q=80" alt="Artisan sourdough with beautiful open crumb and scored crust">
-      <p>Against this industrial backdrop, a sourdough renaissance has been underway since the 1980s and accelerated dramatically during the pandemic years of 2020–21, when millions of people discovered the meditative pleasures of slow fermentation. Artisan bakeries proliferated in cities worldwide. Home bakers invested in millstones to grind their own flour. The ancient technology of wild fermentation became, paradoxically, thoroughly contemporary.</p>
-    `,
+    excerpt: "Bread is the most universal food in human history. Trace its extraordinary journey from ancient flatbreads to the sourdough renaissance.",
+    content: `<p>Bread has been with us for approximately 14,000 years — long before the dawn of agriculture, ancient hunter-gatherers were grinding wild grains and cooking flatbreads on hot stones.</p><h2>The Discovery of Leavening</h2><p>The discovery that bread could rise — that wild yeasts in the air, captured by a mixture of flour and water, would create gases that lifted the dough — was one of the most consequential accidents in culinary history.</p>`,
     faqs: [
-      {q: "What is the oldest surviving bread recipe?", a: "The ancient Egyptians left hieroglyphic records of bread making, and archaeologists have found actual bread loaves in Egyptian tombs thousands of years old. Researchers have even baked experimental bread using yeasts cultured from ancient Egyptian pottery."},
-      {q: "Why is sourdough considered healthier than commercial bread?", a: "Long fermentation partially breaks down phytic acid (an antinutrient), improves mineral bioavailability, and partially pre-digests gluten. Some people with non-celiac gluten sensitivity tolerate sourdough better than commercial bread."},
-      {q: "What's the significance of bread in different religions?", a: "Bread holds sacred significance across many faiths. In Christianity, it represents the body of Christ in the Eucharist. In Judaism, challah marks the Sabbath. In Islam, bread is considered a blessing not to be wasted."},
-      {q: "What's the difference between a starter and commercial yeast?", a: "A sourdough starter is a culture of wild yeasts and lactic acid bacteria that you maintain by feeding with flour and water. It produces slower fermentation, more complex flavor, and distinct acidity. Commercial yeast is a single, standardized strain that ferments quickly and predictably."},
-      {q: "Will bread ever go out of fashion?", a: "Highly unlikely. Bread is woven into human culture at the most fundamental level — as sustenance, as symbol, and as pleasure. Low-carb diet trends create temporary dips in consumption, but bread's cultural centrality and versatility ensure its permanence."}
+      {q: "Why is sourdough considered healthier than commercial bread?", a: "Long fermentation partially breaks down phytic acid (an antinutrient) and improves mineral bioavailability."},
+      {q: "Will bread ever go out of fashion?", a: "Highly unlikely. Bread is woven into human culture at the most fundamental level — as sustenance, as symbol, and as pleasure."}
     ],
-    keyTakeaways: ["Bread has been made for approximately 14,000 years — predating agriculture", "Ancient Egyptians developed sophisticated bread-making including enclosed oven baking", "Every grain-growing civilization developed its own distinctive bread tradition", "The Industrial Revolution accelerated bread production at the cost of quality and nutrition", "The sourdough renaissance is a direct response to industrial bread's shortcomings"],
-    conclusion: "Bread is perhaps the most profound demonstration of what cooking can mean to a culture. It is simultaneously the most humble and the most universal food — present at every table from the most extravagant feast to the simplest meal. When you bake bread, you join a tradition that stretches back to the very beginning of human civilization. There is something deeply moving about that connection, and it makes every loaf you pull from the oven all the more meaningful."
+    keyTakeaways: ["Bread has been made for approximately 14,000 years — predating agriculture", "Every grain-growing civilization developed its own distinctive bread tradition", "The sourdough renaissance is a direct response to industrial bread's shortcomings"],
+    conclusion: "Bread is perhaps the most profound demonstration of what cooking can mean to a culture. It is simultaneously the most humble and the most universal food."
   },
   {
     title: "Mastering Plant-Based Cooking: Beyond the Basics",
     category: "Health",
-    date: "Nov 15, 2026",
+    date: "Nov 15, 2025",
     readTime: 10,
     image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=900&auto=format&fit=crop&q=80",
-    excerpt: "Plant-based cooking has evolved far beyond salads and steamed vegetables. Discover the techniques, ingredients, and philosophies that make vegetables the most exciting ingredients in your kitchen.",
-    content: `
-      <p>The greatest shift in contemporary cooking is not in restaurants — it's in home kitchens, where more cooks than ever are exploring plant-based eating. Not necessarily as vegans or vegetarians, but as omnivores who have discovered that vegetables, grains, legumes, and plant proteins can be cooked with the same technique, creativity, and intention that we bring to meat, and that the results can be extraordinarily satisfying.</p>
-      <img src="https://images.unsplash.com/photo-1576021182211-9ea8dced3690?w=800&auto=format&fit=crop&q=80" alt="Plant-based food">
-      <h2>Treating Vegetables as Protagonists</h2>
-      <p>The first principle of excellent plant-based cooking is a philosophical one: vegetables must be treated as protagonists, not supporting characters. This means applying the same techniques you would use on a prime cut of beef — proper seasoning at every stage, building color through the Maillard reaction, creating textural contrast, balancing flavors deliberately. A roasted cauliflower given the same attention and technique as a roast chicken can be equally impressive and satisfying.</p>
-      <p>Char is transformative. Vegetables charred over high heat — whether on a grill, under a broiler, or in a very hot cast iron pan — develop extraordinary flavor through caramelization and Maillard browning. Charred leeks dressed in a vinaigrette are revelatory. Blackened corn kernels in a salad add complexity and smokiness. Don't fear color on vegetables — embrace it.</p>
-      <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=80" alt="Vegetables">
-      <h2>Building Flavor Without Meat</h2>
-      <p>The challenge in plant-based cooking is building the depth and savoriness that omnivore eaters often associate with meat. The answer lies in understanding plant-based umami sources: fermented foods (miso, soy sauce, nutritional yeast), concentrated tomato products, mushrooms (especially dried shiitake and porcini), seaweed, and long-cooked vegetable stocks.</p>
-      <p>Miso paste is one of the most powerful tools in plant-based cooking. Stir a tablespoon into vegetable soups, roast roots with a miso glaze, add to dressings for depth and savoriness. Nutritional yeast — with its naturally high glutamate content — adds a cheesy, savory note to everything from pasta sauces to popcorn. These ingredients don't make food taste like meat; they make it taste satisfying on its own terms.</p>
-      <h2>Legumes: The Most Underestimated Protein</h2>
-      <p>Dried beans, lentils, and chickpeas are among the most nutritionally dense, economical, and delicious foods available — yet they remain profoundly undervalued in Western cooking. Properly cooked dried chickpeas (soaked overnight, seasoned from the start, simmered slowly) are incomparably superior to canned chickpeas. Beluga lentils, dressed while still warm with good olive oil and herbs, are an elegant and deeply satisfying dish.</p>
-      <p>The key to great legume cooking is seasoning properly throughout the process. Start by sautéeing aromatics deeply, cook the legumes in flavorful liquid, season generously with salt after they're tender (salting before cooking can toughen skins), and finish with acid (lemon, vinegar) and fat (olive oil, tahini) which brighten and enrich simultaneously.</p>
-    `,
+    excerpt: "Plant-based cooking has evolved far beyond salads and steamed vegetables. Discover the techniques and ingredients that make vegetables the most exciting in your kitchen.",
+    content: `<p>The greatest shift in contemporary cooking is in home kitchens, where more cooks than ever are exploring plant-based eating. Not necessarily as vegans or vegetarians, but as omnivores who have discovered that vegetables can be cooked with the same technique and creativity as meat.</p><h2>Treating Vegetables as Protagonists</h2><p>The first principle of excellent plant-based cooking is philosophical: vegetables must be treated as protagonists, not supporting characters. A roasted cauliflower given the same attention and technique as a roast chicken can be equally impressive and satisfying.</p>`,
     faqs: [
-      {q: "How do I make plant-based food satisfying and filling?", a: "Include adequate protein (legumes, nuts, seeds, tofu), fat (olive oil, avocado, tahini), and complex carbohydrates (whole grains, root vegetables). Umami-rich ingredients also increase satiety significantly."},
-      {q: "What's the best substitute for cheese in plant-based cooking?", a: "Nutritional yeast for savory/cheesy flavor, cashew cream for texture, miso for depth. No single ingredient perfectly replicates cheese, but the combination can be very satisfying."},
-      {q: "How do I get protein from a plant-based diet?", a: "Legumes (beans, lentils, chickpeas), tofu and tempeh, seitan, edamame, quinoa (complete protein), nuts and seeds. Combining different plant protein sources throughout the day ensures complete amino acid profiles."},
-      {q: "Is plant-based cooking more expensive than cooking with meat?", a: "Generally no — legumes, grains, and seasonal vegetables are among the most affordable foods available. Cost increases if you rely heavily on processed plant-based meat substitutes."},
-      {q: "How do I make plant-based food taste as satisfying as meat dishes?", a: "Focus on umami (miso, soy sauce, mushrooms), apply high heat for Maillard browning, season aggressively, balance fat and acid, and use textural contrast. The result can be equally craveable."}
+      {q: "How do I make plant-based food satisfying and filling?", a: "Include adequate protein (legumes, nuts, seeds, tofu), fat, and complex carbohydrates. Umami-rich ingredients also increase satiety significantly."},
+      {q: "Is plant-based cooking more expensive than cooking with meat?", a: "Generally no — legumes, grains, and seasonal vegetables are among the most affordable foods available."}
     ],
-    keyTakeaways: ["Treat vegetables as protagonists — apply the same technique and intention as with meat", "High heat and char create extraordinary flavor through caramelization and Maillard reactions", "Umami-rich plant ingredients (miso, soy sauce, mushrooms, nutritional yeast) build depth and savoriness", "Properly cooked dried legumes far outperform canned in both flavor and texture", "Plant-based cooking is economical, environmentally beneficial, and capable of extraordinary flavor"],
-    conclusion: "The most exciting cooking happening right now is plant-based cooking. Not because meat is going away, but because an entire generation of cooks is applying serious technique and creativity to vegetables, legumes, and grains that have historically been treated as afterthoughts. The result is a golden age of plant-forward cooking that is improving both our health and our palates. Even if you have no intention of giving up meat, dedicating one meal a week to exploring plant-based cooking will make you a more skilled, more creative, and more resourceful cook."
+    keyTakeaways: ["Treat vegetables as protagonists — apply the same technique as with meat", "High heat and char create extraordinary flavor through caramelization", "Umami-rich plant ingredients build depth and savoriness"],
+    conclusion: "The most exciting cooking happening right now is plant-based cooking. Even if you have no intention of giving up meat, exploring plant-based cooking will make you a more skilled, more creative cook."
   },
   {
     title: "The Perfect Roast: A Complete Guide to Sunday Dinner",
     category: "Techniques",
-    date: "Nov 8, 2026",
+    date: "Nov 8, 2025",
     readTime: 9,
     image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=900&auto=format&fit=crop&q=80",
-    excerpt: "The Sunday roast is a ritual worth perfecting. From choosing the right cut and dry-brining to achieving perfect crackling, resting properly, and making a transcendent gravy — this is your complete guide.",
-    content: `
-      <p>Few things in cooking match the satisfaction of a perfectly executed Sunday roast. The way the house fills with the smell of roasting meat and herbs. The anticipation as the resting joint perfumes the kitchen. The moment the carving knife meets perfectly cooked meat that yields in ribbons of juicy, tender flesh. This is cooking at its most primal and most pleasurable — and it's a skill well worth mastering.</p>
-      <img src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&auto=format&fit=crop&q=80" alt="Sunday roast">
-      <h2>Choosing Your Joint</h2>
-      <p>Different roasting meats have different requirements and reward different approaches. Beef fillet is the most tender and requires the shortest cooking time; rib-eye roast offers more flavor through its marbling; top rump requires basting and careful temperature management. For pork, a shoulder roast with scored skin becomes the vehicle for extraordinary crackling; the loin is leaner and more elegant. Lamb shoulder, slow-roasted until it falls apart, is perhaps the most forgiving and most delicious of all roasting options.</p>
-      <p>For any roast, size matters. A small joint cooks through too quickly, spending insufficient time in the oven to develop flavor and color. Aim for a minimum of 1.5kg for a meaningful roast. And always buy the best quality you can afford — at no point in cooking does the quality of the ingredient translate more directly to the quality of the result.</p>
-      <img src="https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=800&auto=format&fit=crop&q=80" alt="Roast beef">
-      <h2>The Power of Dry-Brining</h2>
-      <p>The single technique that most significantly improves a roast is dry-brining: salting the meat generously 24–48 hours before cooking and leaving it uncovered in the refrigerator. The salt draws moisture out of the surface initially, then is reabsorbed into the meat along with dissolved proteins, seasoning the interior of the joint and improving its water-retention capacity during cooking.</p>
-      <p>For pork with skin, dry-brining also desiccates the skin, enabling dramatically better crackling. Pat the skin completely dry before cooking and score it deeply at 1cm intervals with a sharp knife. Some cooks even use a hairdryer on cool setting for 10 minutes immediately before roasting, and the results justify what might seem like an eccentric technique.</p>
-      <h2>Temperature and Timing</h2>
-      <p>Every serious roast cook needs a reliable meat thermometer. Visual cues and "cooking time per kilo" guidelines are too unreliable for consistently excellent results. For beef cooked medium-rare, aim for 54–57°C at the center. For pork (now safe to eat at 63°C, pink and slightly juicy), use a thermometer to remove the guesswork. For lamb, 60–63°C gives perfect pink medium. Always remove the joint 3–5°C below your target temperature and rest it — the internal temperature will continue to rise as it rests.</p>
-      <p>The rest is as important as the cook. During resting under a foil tent (but don't wrap it tightly — steam will soften crackling or crust), the muscle fibers relax and reabsorb juices. A 2kg joint needs at least 20–30 minutes resting. During this time, you can prepare your gravy, finish the vegetables, and warm your plates — the timing works beautifully.</p>
-    `,
+    excerpt: "From choosing the right cut and dry-brining to achieving perfect crackling and making a transcendent gravy — this is your complete guide to the Sunday roast.",
+    content: `<p>Few things in cooking match the satisfaction of a perfectly executed Sunday roast. The way the house fills with the smell of roasting meat and herbs. The anticipation as the resting joint perfumes the kitchen.</p><h2>Choosing Your Joint</h2><p>Different roasting meats have different requirements. Beef fillet is the most tender; rib-eye roast offers more flavor through its marbling. For pork, a shoulder roast with scored skin becomes the vehicle for extraordinary crackling.</p>`,
     faqs: [
-      {q: "How do I get perfect crackling on pork?", a: "Score the skin deeply, dry-brine uncovered 24–48 hours, pat dry before cooking, start at high heat (220°C for 20 min), then reduce. The skin must be completely dry and scored to crack properly."},
-      {q: "What temperature should I rest my roast at?", a: "Loosely tented with foil at room temperature. Don't keep it in a warm oven — continued heat will overcook it. Rest for minimum 20 minutes per kilogram of meat."},
-      {q: "How do I make proper gravy from roasting juices?", a: "Pour fat from roasting pan (save it for roasting potatoes). Add wine to the pan over heat, scraping fond. Add stock and reduce. Thicken if desired with a little beurre manié. Strain and season."},
-      {q: "My roast always comes out gray on the outside. Why?", a: "The oven temperature is too low for initial browning. Start at 220°C for the first 20 minutes to brown the exterior, then reduce to 160–180°C for the remainder."},
-      {q: "Can I prepare a roast in advance?", a: "Dry-brining can be done 2 days ahead. Vegetables for roasting can be prepped day before. However, the actual roasting must be done close to serving time for best results."}
+      {q: "How do I get perfect crackling on pork?", a: "Score the skin deeply, dry-brine uncovered 24–48 hours, pat dry before cooking, start at high heat (220°C for 20 min), then reduce."},
+      {q: "How do I make proper gravy from roasting juices?", a: "Pour fat from roasting pan. Add wine to the pan over heat, scraping fond. Add stock and reduce. Thicken if desired. Strain and season."}
     ],
-    keyTakeaways: ["Dry-brining (salting 24–48 hours ahead) dramatically improves seasoning and texture", "A meat thermometer is the only reliable way to ensure perfectly cooked meat", "Remove the joint 3–5°C below target temperature — it will rise during resting", "Rest for at least 20 minutes per kilogram; this step cannot be skipped", "Proper gravy made from deglazed roasting juices elevates the entire meal"],
-    conclusion: "A truly great Sunday roast is one of the highest expressions of home cooking — a meal that brings people together, fills the house with extraordinary aromas, and produces leftovers that spawn several more excellent meals. It rewards patience, technique, and quality ingredients, and it never gets old. Master the principles in this guide, and every roast will be an occasion. Start this Sunday, and you'll be on the path to one of cooking's greatest pleasures."
+    keyTakeaways: ["Dry-brining (salting 24–48 hours ahead) dramatically improves seasoning and texture", "A meat thermometer is the only reliable way to ensure perfectly cooked meat", "Rest for at least 20 minutes per kilogram — this step cannot be skipped"],
+    conclusion: "A truly great Sunday roast is one of the highest expressions of home cooking — a meal that brings people together and fills the house with extraordinary aromas."
   }
 ];
 
@@ -2055,14 +2020,9 @@ const team = [
 // RENDER FUNCTIONS
 // ========================
 function renderHome() {
-  // Hero
   document.getElementById('heroBg').style.backgroundImage = "url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1600&auto=format&fit=crop&q=80')";
-  
-  // Featured recipes (first 6)
   const fr = document.getElementById('featuredRecipes');
   fr.innerHTML = recipes.map((r,i) => recipeCard(r,i)).join('');
-  
-  // Categories
   const cg = document.getElementById('catsGrid');
   cg.innerHTML = categories.map(c => `
     <div class="cat-card">
@@ -2073,7 +2033,11 @@ function renderHome() {
 }
 
 function recipeCard(r, i) {
+  const editToolbar = isAdmin ? `<div class="recipe-edit-toolbar" onclick="event.stopPropagation()">
+    <button onclick="editRecipe(${i})">✏️ Edit</button>
+  </div>` : '';
   return `<div class="recipe-card" onclick="openRecipe(${i})">
+    ${editToolbar}
     <div class="recipe-img-wrap">
       <img src="${r.image}" alt="${r.title}" class="recipe-img" loading="lazy">
       ${r.badge ? `<span class="recipe-badge">${r.badge}</span>` : ''}
@@ -2103,7 +2067,13 @@ function renderBlogs() {
 }
 
 function blogCard(b, i) {
+  const editToolbar = isAdmin ? `<div class="blog-edit-toolbar" onclick="event.stopPropagation()">
+    <button onclick="editBlogCard(${i})">✏️ Edit Card</button>
+    <button onclick="editBlogFull(${i})">📝 Edit Content</button>
+    <button class="delete-btn" onclick="deleteBlog(${i})">🗑 Delete</button>
+  </div>` : '';
   return `<div class="blog-card" onclick="openBlog(${i})">
+    ${editToolbar}
     <div class="blog-card-img-wrap">
       <img src="${b.image}" alt="${b.title}" class="blog-card-img" loading="lazy">
       <span class="blog-card-cat">${b.category}</span>
@@ -2123,8 +2093,9 @@ function blogCard(b, i) {
 
 function renderTeam() {
   const tg = document.getElementById('teamGrid');
-  tg.innerHTML = team.map(t => `
+  tg.innerHTML = team.map((t,i) => `
     <div class="team-card">
+      ${isAdmin ? `<div class="team-edit-toolbar"><button onclick="editTeamMember(${i})" style="background:var(--terracotta);color:white;border:none;border-radius:20px;padding:4px 10px;font-size:0.7rem;font-weight:700;cursor:pointer">✏️ Edit</button></div>` : ''}
       <img src="${t.img}" alt="${t.name}" class="team-img">
       <div class="team-name">${t.name}</div>
       <div class="team-role">${t.role}</div>
@@ -2140,15 +2111,12 @@ function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  
   const links = document.querySelectorAll('.nav-links a');
   const map = {home:0, recipes:1, blog:2, about:3, contact:4};
   if(map[page] !== undefined) links[map[page]].classList.add('active');
-  
   currentPage = page;
   updateEditBtn();
   window.scrollTo(0,0);
-  
   if(page === 'recipes') renderRecipes();
   if(page === 'about') renderTeam();
   if(page === 'blog') renderBlogs();
@@ -2181,17 +2149,16 @@ function openBlog(i) {
   const b = blogs[i];
   document.getElementById('blogModalImg').src = b.image;
   document.getElementById('blogModalImg').alt = b.title;
-  
-  const faqs = b.faqs.map(f=>`
+  const faqs = (b.faqs||[]).map(f=>`
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">${f.q} <span class="faq-arrow">▾</span></div>
       <div class="faq-a">${f.a}</div>
     </div>
   `).join('');
-  
-  const takeaways = b.keyTakeaways.map(k=>`<li>${k}</li>`).join('');
-  
+  const takeaways = (b.keyTakeaways||[]).map(k=>`<li>${k}</li>`).join('');
+  const editBtn = isAdmin ? `<button class="edit-full-post-btn" onclick="editBlogFull(${i});closeModalBtn('blogModal')">✏️ Edit This Post</button>` : '';
   document.getElementById('blogModalBody').innerHTML = `
+    ${editBtn}
     <span class="tag-badge">${b.category}</span>
     <h1 class="blog-post-title">${b.title}</h1>
     <div class="blog-meta-bar">
@@ -2200,36 +2167,23 @@ function openBlog(i) {
       <span>✍️ Maria Kanwal</span>
     </div>
     <div class="blog-content">${b.content}</div>
-    <div class="key-takeaways">
-      <h3>Key Takeaways</h3>
-      <ul style="list-style:none;padding:0">${takeaways}</ul>
-    </div>
-    <div class="blog-conclusion">
-      <h3>Conclusion</h3>
-      <p>${b.conclusion}</p>
-    </div>
-    <div class="faq-section">
-      <div class="faq-title">Frequently Asked Questions</div>
-      ${faqs}
-    </div>
+    ${takeaways ? `<div class="key-takeaways"><h3>Key Takeaways</h3><ul style="list-style:none;padding:0">${takeaways}</ul></div>` : ''}
+    ${b.conclusion ? `<div class="blog-conclusion"><h3>Conclusion</h3><p>${b.conclusion}</p></div>` : ''}
+    ${faqs ? `<div class="faq-section"><div class="faq-title">Frequently Asked Questions</div>${faqs}</div>` : ''}
   `;
-  
   document.getElementById('blogModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function toggleFaq(el) {
-  const item = el.parentElement;
-  item.classList.toggle('open');
+  el.parentElement.classList.toggle('open');
 }
 
 // ========================
 // MODAL CLOSE
 // ========================
 function closeModal(id, e) {
-  if(e.target.id === id || e.target.classList.contains('modal-overlay')) {
-    closeModalBtn(id);
-  }
+  if(e.target.id === id || e.target.classList.contains('modal-overlay')) closeModalBtn(id);
 }
 
 function closeModalBtn(id) {
@@ -2243,23 +2197,20 @@ function closeModalBtn(id) {
 function filterRecipes() {
   const q = document.getElementById('recipeSearch').value.toLowerCase();
   const cat = document.getElementById('recipeCategory').value;
-  const cards = document.querySelectorAll('#allRecipesGrid .recipe-card');
-  const titles = recipes;
-  
   document.getElementById('allRecipesGrid').innerHTML = recipes
-    .filter((r,i) => {
+    .filter(r => {
       const matchQ = !q || r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q);
       const matchCat = !cat || r.category === cat;
       return matchQ && matchCat;
     })
-    .map((r,i) => recipeCard(r, recipes.indexOf(r)))
+    .map((r) => recipeCard(r, recipes.indexOf(r)))
     .join('');
 }
 
 function filterBlogs() {
   const q = document.getElementById('blogSearch').value.toLowerCase();
-  const filtered = blogs.filter((b,i) => !q || b.title.toLowerCase().includes(q) || b.excerpt.toLowerCase().includes(q) || b.category.toLowerCase().includes(q));
-  document.getElementById('blogsGrid').innerHTML = filtered.map((b) => blogCard(b, blogs.indexOf(b))).join('');
+  const filtered = blogs.filter(b => !q || b.title.toLowerCase().includes(q) || b.excerpt.toLowerCase().includes(q) || b.category.toLowerCase().includes(q));
+  document.getElementById('blogsGrid').innerHTML = filtered.map(b => blogCard(b, blogs.indexOf(b))).join('');
   document.getElementById('blogCount').textContent = filtered.length;
 }
 
@@ -2274,10 +2225,7 @@ function submitContact() {
 // ADMIN
 // ========================
 function showAdminLogin() {
-  if(isAdmin) {
-    openAdminPanel();
-    return;
-  }
+  if(isAdmin) { openAdminPanel(); return; }
   document.getElementById('adminLogin').classList.add('open');
   document.body.style.overflow = 'hidden';
   setTimeout(() => document.getElementById('adminPassword').focus(), 100);
@@ -2288,9 +2236,15 @@ function checkAdmin() {
   if(pw === ADMIN_PASS) {
     isAdmin = true;
     closeAdminLogin();
-    showToast('Welcome back, Admin! 🔓', 'success');
+    enableEditMode();
+    showToast('Welcome back, Admin! ✏️ Edit mode is now active.', 'success');
     document.getElementById('addBlogBtn').style.display = 'inline-block';
     updateEditBtn();
+    // Re-render pages with edit controls
+    renderHome();
+    if(currentPage === 'blog') renderBlogs();
+    if(currentPage === 'recipes') renderRecipes();
+    if(currentPage === 'about') renderTeam();
   } else {
     showToast('Incorrect password. Try again.', 'error');
     document.getElementById('adminPassword').value = '';
@@ -2319,10 +2273,10 @@ function openAddBlog() {
   openAdminPanel();
 }
 
-function switchAdminTab(tab) {
+function switchAdminTab(tab, e) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.editor-panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
+  if(e && e.target) e.target.classList.add('active');
   document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
 }
 
@@ -2333,18 +2287,16 @@ function addBlogFromText() {
   const image = document.getElementById('newImage').value.trim() || 'https://images.unsplash.com/photo-1547592180-85f173990554?w=900&auto=format&fit=crop&q=80';
   const excerpt = document.getElementById('newExcerpt').value.trim();
   const content = document.getElementById('newContent').value.trim();
-  
   if(!title || !content) { showToast('Please fill in at least the title and content fields.', 'error'); return; }
-  
   const newBlog = {
-    title, category, date: new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}),
+    title, category,
+    date: new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}),
     readTime, image, excerpt: excerpt || title,
     content: `<p>${content.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`,
-    faqs: [{q:"Have questions about this topic?",a:"Feel free to reach out via our contact page and we'll be happy to help!"}],
+    faqs: [{q:"Have questions about this topic?",a:"Feel free to reach out via our contact page!"}],
     keyTakeaways: ["Read the full article for complete insights"],
     conclusion: "Thank you for reading! We hope this article was helpful and informative."
   };
-  
   blogs.unshift(newBlog);
   closeAdminPanel();
   renderBlogs();
@@ -2376,8 +2328,30 @@ function addBlogFromCode() {
 }
 
 // ========================
-// EDIT MODE
+// EDIT MODE (inline)
 // ========================
+function enableEditMode() {
+  editModeActive = true;
+  document.body.classList.add('edit-mode');
+  // Make all [data-editable] elements contenteditable
+  document.querySelectorAll('[data-editable]').forEach(el => {
+    el.contentEditable = 'true';
+    el.addEventListener('blur', handleInlineEdit);
+    el.addEventListener('keydown', function(e) {
+      if(e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        el.blur();
+      }
+    });
+  });
+}
+
+function handleInlineEdit(e) {
+  const el = e.target;
+  const field = el.getAttribute('data-field');
+  showToast(`✅ "${field}" updated`, 'success');
+}
+
 function updateEditBtn() {
   const btn = document.getElementById('editFloatBtn');
   btn.classList.toggle('hidden', !isAdmin);
@@ -2387,8 +2361,245 @@ function openEditMode() {
   if(currentPage === 'blog') {
     openAdminPanel();
   } else {
-    showToast('Edit mode: Right-click any element and select Edit to modify content. (Demo)', 'success');
+    showToast('✏️ Click any highlighted text to edit it directly!', 'success');
   }
+}
+
+// ========================
+// EDIT BLOG CARD (modal form)
+// ========================
+function editBlogCard(i) {
+  const b = blogs[i];
+  currentEditBlogIndex = i;
+  document.getElementById('editModalTitle').textContent = '✏️ Edit Blog Card';
+  document.getElementById('editModalFields').innerHTML = `
+    <div class="edit-field-group">
+      <label>Title</label>
+      <input type="text" id="ef_title" value="${escHtml(b.title)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Category</label>
+      <select id="ef_category">
+        ${['Techniques','Ingredients','Culture','Health','Tips & Tricks','Equipment'].map(c=>`<option ${b.category===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="edit-field-group">
+      <label>Date</label>
+      <input type="text" id="ef_date" value="${escHtml(b.date)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Read Time (minutes)</label>
+      <input type="number" id="ef_readTime" value="${b.readTime}" min="1">
+    </div>
+    <div class="edit-field-group">
+      <label>Image URL</label>
+      <input type="text" id="ef_image" value="${escHtml(b.image)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Excerpt</label>
+      <textarea id="ef_excerpt">${escHtml(b.excerpt)}</textarea>
+    </div>
+  `;
+  editModalCallback = () => {
+    blogs[i].title = document.getElementById('ef_title').value;
+    blogs[i].category = document.getElementById('ef_category').value;
+    blogs[i].date = document.getElementById('ef_date').value;
+    blogs[i].readTime = parseInt(document.getElementById('ef_readTime').value) || 8;
+    blogs[i].image = document.getElementById('ef_image').value;
+    blogs[i].excerpt = document.getElementById('ef_excerpt').value;
+    renderBlogs();
+    showToast('Blog card updated! ✅', 'success');
+  };
+  openEditContentModal();
+}
+
+// ========================
+// EDIT BLOG FULL CONTENT
+// ========================
+function editBlogFull(i) {
+  const b = blogs[i];
+  currentEditBlogIndex = i;
+  document.getElementById('editModalTitle').textContent = '📝 Edit Blog Post Content';
+  document.getElementById('editModalFields').innerHTML = `
+    <div class="edit-field-group">
+      <label>Title</label>
+      <input type="text" id="ef_title" value="${escHtml(b.title)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Full Content (HTML supported)</label>
+      <textarea class="xlarge" id="ef_content">${escHtml(b.content)}</textarea>
+    </div>
+    <div class="edit-field-group">
+      <label>Key Takeaways (one per line)</label>
+      <textarea class="large" id="ef_takeaways">${(b.keyTakeaways||[]).join('\n')}</textarea>
+    </div>
+    <div class="edit-field-group">
+      <label>Conclusion</label>
+      <textarea id="ef_conclusion">${escHtml(b.conclusion||'')}</textarea>
+    </div>
+    <div class="edit-field-group">
+      <label>FAQs (JSON array: [{"q":"...","a":"..."}])</label>
+      <textarea class="large" id="ef_faqs">${escHtml(JSON.stringify(b.faqs||[], null, 2))}</textarea>
+    </div>
+  `;
+  editModalCallback = () => {
+    blogs[i].title = document.getElementById('ef_title').value;
+    blogs[i].content = document.getElementById('ef_content').value;
+    blogs[i].keyTakeaways = document.getElementById('ef_takeaways').value.split('\n').filter(s=>s.trim());
+    blogs[i].conclusion = document.getElementById('ef_conclusion').value;
+    try { blogs[i].faqs = JSON.parse(document.getElementById('ef_faqs').value); } catch(e) {}
+    renderBlogs();
+    showToast('Blog post content updated! ✅', 'success');
+  };
+  openEditContentModal();
+}
+
+// ========================
+// DELETE BLOG
+// ========================
+function deleteBlog(i) {
+  if(!confirm(`Delete "${blogs[i].title}"? This cannot be undone.`)) return;
+  blogs.splice(i, 1);
+  renderBlogs();
+  showToast('Blog post deleted.', '');
+}
+
+// ========================
+// EDIT RECIPE
+// ========================
+function editRecipe(i) {
+  const r = recipes[i];
+  currentEditRecipeIndex = i;
+  document.getElementById('editModalTitle').textContent = '🍳 Edit Recipe';
+  document.getElementById('editModalFields').innerHTML = `
+    <div class="edit-field-group">
+      <label>Title</label>
+      <input type="text" id="er_title" value="${escHtml(r.title)}">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="edit-field-group">
+        <label>Category</label>
+        <input type="text" id="er_category" value="${escHtml(r.category)}">
+      </div>
+      <div class="edit-field-group">
+        <label>Badge (e.g. Trending)</label>
+        <input type="text" id="er_badge" value="${escHtml(r.badge||'')}">
+      </div>
+      <div class="edit-field-group">
+        <label>Time</label>
+        <input type="text" id="er_time" value="${escHtml(r.time)}">
+      </div>
+      <div class="edit-field-group">
+        <label>Difficulty</label>
+        <input type="text" id="er_difficulty" value="${escHtml(r.difficulty)}">
+      </div>
+      <div class="edit-field-group">
+        <label>Servings</label>
+        <input type="text" id="er_servings" value="${escHtml(r.servings)}">
+      </div>
+    </div>
+    <div class="edit-field-group">
+      <label>Image URL</label>
+      <input type="text" id="er_image" value="${escHtml(r.image)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Description</label>
+      <textarea id="er_desc">${escHtml(r.desc)}</textarea>
+    </div>
+    <div class="edit-field-group">
+      <label>Ingredients (one per line)</label>
+      <textarea class="large" id="er_ingredients">${r.ingredients.join('\n')}</textarea>
+    </div>
+    <div class="edit-field-group">
+      <label>Steps (one per line)</label>
+      <textarea class="large" id="er_steps">${r.steps.join('\n')}</textarea>
+    </div>
+  `;
+  editModalCallback = () => {
+    recipes[i].title = document.getElementById('er_title').value;
+    recipes[i].category = document.getElementById('er_category').value;
+    recipes[i].badge = document.getElementById('er_badge').value;
+    recipes[i].time = document.getElementById('er_time').value;
+    recipes[i].difficulty = document.getElementById('er_difficulty').value;
+    recipes[i].servings = document.getElementById('er_servings').value;
+    recipes[i].image = document.getElementById('er_image').value;
+    recipes[i].desc = document.getElementById('er_desc').value;
+    recipes[i].ingredients = document.getElementById('er_ingredients').value.split('\n').filter(s=>s.trim());
+    recipes[i].steps = document.getElementById('er_steps').value.split('\n').filter(s=>s.trim());
+    renderHome();
+    renderRecipes();
+    showToast('Recipe updated! ✅', 'success');
+  };
+  openEditContentModal();
+}
+
+// ========================
+// EDIT TEAM MEMBER
+// ========================
+function editTeamMember(i) {
+  const t = team[i];
+  document.getElementById('editModalTitle').textContent = '👤 Edit Team Member';
+  document.getElementById('editModalFields').innerHTML = `
+    <div class="edit-field-group">
+      <label>Name</label>
+      <input type="text" id="et_name" value="${escHtml(t.name)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Role</label>
+      <input type="text" id="et_role" value="${escHtml(t.role)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Image URL</label>
+      <input type="text" id="et_img" value="${escHtml(t.img)}">
+    </div>
+    <div class="edit-field-group">
+      <label>Bio</label>
+      <textarea id="et_bio">${escHtml(t.bio)}</textarea>
+    </div>
+  `;
+  editModalCallback = () => {
+    team[i].name = document.getElementById('et_name').value;
+    team[i].role = document.getElementById('et_role').value;
+    team[i].img = document.getElementById('et_img').value;
+    team[i].bio = document.getElementById('et_bio').value;
+    renderTeam();
+    showToast('Team member updated! ✅', 'success');
+  };
+  openEditContentModal();
+}
+
+// ========================
+// EDIT MODAL HELPERS
+// ========================
+function openEditContentModal() {
+  document.getElementById('editContentModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal(e) {
+  if(e.target.id === 'editContentModal') closeEditModalBtn();
+}
+
+function closeEditModalBtn() {
+  document.getElementById('editContentModal').classList.remove('open');
+  document.body.style.overflow = '';
+  editModalCallback = null;
+}
+
+function saveEditModal() {
+  if(editModalCallback) {
+    try {
+      editModalCallback();
+      closeEditModalBtn();
+    } catch(err) {
+      showToast('Error saving: ' + err.message, 'error');
+    }
+  }
+}
+
+function escHtml(str) {
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ========================
