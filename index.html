@@ -1319,7 +1319,7 @@ body.edit-mode .team-card:hover {
 <!-- ===== BLOG PAGE ===== -->
 <div id="page-blog" class="page">
   <div class="blog-header">
-    <h1 data-editable data-field="blog-header-title">Food Stories & Guides</h1>
+    <h1 data-editable data-field="blog-header-title">Food Stories &amp; Guides</h1>
     <p data-editable data-field="blog-header-sub">Culinary wisdom, tips, and tales from our kitchen</p>
   </div>
   <div class="blog-controls">
@@ -1472,7 +1472,7 @@ body.edit-mode .team-card:hover {
     <div class="footer-col">
       <h4>Categories</h4>
       <a href="#">Breakfast</a>
-      <a href="#">Pasta & Grains</a>
+      <a href="#">Pasta &amp; Grains</a>
       <a href="#">Soups</a>
       <a href="#">Desserts</a>
       <a href="#">Vegetarian</a>
@@ -1555,7 +1555,7 @@ body.edit-mode .team-card:hover {
           <label>Category</label>
           <select class="form-control" id="newCategory">
             <option>Techniques</option><option>Ingredients</option><option>Culture</option>
-            <option>Health</option><option>Tips & Tricks</option><option>Equipment</option>
+            <option>Health</option><option>Tips &amp; Tricks</option><option>Equipment</option>
           </select>
         </div>
         <div class="form-group">
@@ -2300,6 +2300,7 @@ function addBlogFromText() {
   blogs.unshift(newBlog);
   closeAdminPanel();
   renderBlogs();
+  saveData();
   showToast(`"${title}" published successfully! 🎉`, 'success');
   document.getElementById('newTitle').value = '';
   document.getElementById('newContent').value = '';
@@ -2320,6 +2321,7 @@ function addBlogFromCode() {
     blogs.unshift(obj);
     closeAdminPanel();
     renderBlogs();
+    saveData();
     showToast(`"${obj.title}" published from JSON! 🎉`, 'success');
     document.getElementById('newCodeContent').value = '';
   } catch(e) {
@@ -2349,6 +2351,7 @@ function enableEditMode() {
 function handleInlineEdit(e) {
   const el = e.target;
   const field = el.getAttribute('data-field');
+  saveData();
   showToast(`✅ "${field}" updated`, 'success');
 }
 
@@ -2461,6 +2464,7 @@ function deleteBlog(i) {
   if(!confirm(`Delete "${blogs[i].title}"? This cannot be undone.`)) return;
   blogs.splice(i, 1);
   renderBlogs();
+  saveData();
   showToast('Blog post deleted.', '');
 }
 
@@ -2590,6 +2594,7 @@ function saveEditModal() {
   if(editModalCallback) {
     try {
       editModalCallback();
+      saveData();
       closeEditModalBtn();
     } catch(err) {
       showToast('Error saving: ' + err.message, 'error');
@@ -2613,9 +2618,51 @@ function showToast(msg, type = '') {
 }
 
 // ========================
+// PERSISTENCE (localStorage)
+// ========================
+function saveData() {
+  try {
+    localStorage.setItem('lc_recipes', JSON.stringify(recipes));
+    localStorage.setItem('lc_blogs',   JSON.stringify(blogs));
+    localStorage.setItem('lc_team',    JSON.stringify(team));
+    // Save inline-edited text fields
+    const fields = {};
+    document.querySelectorAll('[data-editable][data-field]').forEach(function(el) {
+      fields[el.getAttribute('data-field')] = el.innerHTML;
+    });
+    localStorage.setItem('lc_fields', JSON.stringify(fields));
+  } catch(e) { console.warn('saveData error', e); }
+}
+
+function loadData() {
+  try {
+    const r = localStorage.getItem('lc_recipes');
+    const b = localStorage.getItem('lc_blogs');
+    const t = localStorage.getItem('lc_team');
+    if(r) { const p = JSON.parse(r); recipes.length = 0; p.forEach(function(x){ recipes.push(x); }); }
+    if(b) { const p = JSON.parse(b); blogs.length   = 0; p.forEach(function(x){ blogs.push(x);   }); }
+    if(t) { const p = JSON.parse(t); team.length    = 0; p.forEach(function(x){ team.push(x);    }); }
+  } catch(e) { console.warn('loadData error', e); }
+}
+
+function loadEditableFields() {
+  try {
+    const saved = localStorage.getItem('lc_fields');
+    if(!saved) return;
+    const fields = JSON.parse(saved);
+    document.querySelectorAll('[data-editable][data-field]').forEach(function(el) {
+      const key = el.getAttribute('data-field');
+      if(fields[key] !== undefined) el.innerHTML = fields[key];
+    });
+  } catch(e) { console.warn('loadEditableFields error', e); }
+}
+
+// ========================
 // INIT
 // ========================
+loadData();
 renderHome();
+loadEditableFields();
 </script>
 </body>
 </html>
